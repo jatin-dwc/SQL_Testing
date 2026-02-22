@@ -1,0 +1,1 @@
+select * from ingest_Transactions
