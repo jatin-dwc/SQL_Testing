@@ -39,7 +39,7 @@ ORDER BY FullDate ;
 ALTER VIEW vw_Last14Days AS
 SELECT *
 FROM dim_Date
-WHERE DayOffset >= -14;
+WHERE DayOffset >= -1400;
 
 
 -- 12 MONTHS

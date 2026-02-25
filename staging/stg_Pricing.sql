@@ -54,6 +54,7 @@ OPTION (MAXRECURSION 0);
 
 -- Code Testing below
 
+/*
 
 SELECT * from stg_Pricing_14Days;
 
@@ -69,3 +70,5 @@ CREATE TABLE stg_Pricing_14Days (
 
 ALTER TABLE stg_Pricing_14Days
 ADD controlID   INTEGER;
+
+*/
