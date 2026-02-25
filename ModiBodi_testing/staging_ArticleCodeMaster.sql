@@ -21,11 +21,11 @@ SELECT
     "Customer name" as uD2,
     "ACTIVE SKUS" as uD3,
     ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code") AS rn, -- this acts to count the rows for non unique values and returns a count value for each line, the WHERE rn = 1 limits the result to only a single value should the CUSTOMERID be Unique
-    "Current RRP AUD" as RRPAUD,
-    "Current RRP EUR" as RRPEUR,
-    "Current RRP GBP" as RRPGBP,
-    "Current RRP NZD" as RRPNZD,
-    "ONLINE USD RRP" as RRPUSD,
+    ROUND("Current RRP AUD",2 ) as RRPAUD,
+    ROUND("Current RRP EUR",2 ) as RRPEUR,
+    ROUND("Current RRP GBP",2 ) as RRPGBP,
+    ROUND("Current RRP NZD",2 ) as RRPNZD,
+    ROUND("ONLINE USD RRP" ,2 ) as RRPUSD,
     CONVERT(CHAR(8), "Launch date AU-US-NZ", 112) as L_AUUSNZ,
     CONVERT(CHAR(8), "Launch date EU", 112) as L_EU,
     CONVERT(CHAR(8), "Launch date UK", 112) as L_UK
@@ -208,6 +208,9 @@ ALTER COLUMN code NVARCHAR(40)
 ALTER TABLE ArticleTest2
 ALTER COLUMN "Item Code" NVARCHAR (40)
 
+ALTER TABLE stg_ArticleCodeMaster_TESTONLY
+ALTER COLUMN salesPrice FLOAT
+
 -- Create Test for ArticleCodeMaster
 
 ALTER TABLE stg_ArticleCodeMaster_TESTONLY
@@ -215,6 +218,7 @@ ADD  groupCode5 NVARCHAR(255)
 
 ALTER TABLE stg_ArticleCodeMaster_TESTONLY
 ADD  salesPrice INTEGER
+
 
 CREATE TABLE stg_ArticleCodeMaster_TESTONLY (
     warehouse       NVARCHAR(20),
