@@ -20,7 +20,15 @@ SELECT
     Size as uD1,
     "Customer name" as uD2,
     "ACTIVE SKUS" as uD3,
-    ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code") AS rn -- this acts to count the rows for non unique values and returns a count value for each line, the WHERE rn = 1 limits the result to only a single value should the CUSTOMERID be Unique
+    ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code") AS rn, -- this acts to count the rows for non unique values and returns a count value for each line, the WHERE rn = 1 limits the result to only a single value should the CUSTOMERID be Unique
+    "Current RRP AUD" as RRPAUD,
+    "Current RRP EUR" as RRPEUR,
+    "Current RRP GBP" as RRPGBP,
+    "Current RRP NZD" as RRPNZD,
+    "ONLINE USD RRP" as RRPUSD,
+    CONVERT(CHAR(8), "Launch date AU-US-NZ", 112) as L_AUUSNZ,
+    CONVERT(CHAR(8), "Launch date EU", 112) as L_EU,
+    CONVERT(CHAR(8), "Launch date UK", 112) as L_UK
 FROM 
     ArticleTest2 ) ,
 
@@ -34,19 +42,47 @@ FROM
 Article_1 as a1
 CROSS JOIN
 vw_Warehouse as w
-WHERE a1.rn=1 ) 
+WHERE a1.rn=1 ) ,
+
+Art_WHS_Price AS (
+SELECT 
+    aw.*,
+    CASE 
+        WHEN w.Currency = 'AUD' then RRPAUD
+        WHEN w.Currency = 'GBP' then RRPGBP
+        WHEN w.Currency = 'USD' then RRPUSD
+        WHEN w.Currency = 'NZD' then RRPNZD
+        WHEN w.Currency = 'EUR' then RRPEUR
+    ELSE RRPAUD
+    END AS salesPrice,
+    CASE
+        WHEN w.Country IN ('Australia' , 'USA', 'NZ') then L_AUUSNZ
+        WHEN w.Country = 'UK' then L_UK
+        WHEN w.Country = 'EU' then L_EU 
+    ELSE L_AUUSNZ
+    END AS groupCode5
+FROM 
+    Art_WHS AS aw 
+INNER JOIN vw_Warehouse as w 
+ON aw.warehouse = w.warehouse
+
+)
+
+
 
 -- Update ArticleCodeMaster Table
 -- Need to amend this code further to include the correct sales price base on the Country - this can be done in the step above and combining a link
 -- Also need to keep in mind that this table will need to be filtered to adhere to the ArticleFilter requirements
+-- Need to add a date table to start with the ArticleFitler process.
 
-INSERT INTO stg_ArticleCodeMaster_TestOnly ( warehouse, code,creationDate,description,criterium1,criterium2,
-                                criterium3,criterium4,groupCode1,groupCode2,groupCode3,groupCode4,groupCode6,uD1,uD2,uD3)
+INSERT INTO stg_ArticleCodeMaster_TestOnly ( warehouse, code,creationDate,description,salesPrice,criterium1,criterium2,
+                                criterium3,criterium4,groupCode1,groupCode2,groupCode3,groupCode4,groupCode5,groupCode6,uD1,uD2,uD3)
 SELECT
     warehouse,
     code,
     creationDate,
     description,
+    salesPrice,
     criterium1,
     criterium2,
     criterium3,
@@ -55,12 +91,13 @@ SELECT
     groupCode2,
     groupCode3,
     groupCode4,
+    groupCode5,
     groupCode6,
     uD1,
     uD2,
     uD3
 FROM
-    Art_WHS ;
+    Art_WHS_Price ;
 
 
 
@@ -86,7 +123,7 @@ WHERE "Slim4 Inscope?" = 'Y'
 
 
 
-
+DROP TABLE stg_ArticleCodes_1
 
 UPDATE ingest_Warehouse
 SET Country = 'UK'
@@ -172,6 +209,12 @@ ALTER TABLE ArticleTest2
 ALTER COLUMN "Item Code" NVARCHAR (40)
 
 -- Create Test for ArticleCodeMaster
+
+ALTER TABLE stg_ArticleCodeMaster_TESTONLY
+ADD  groupCode5 NVARCHAR(255)
+
+ALTER TABLE stg_ArticleCodeMaster_TESTONLY
+ADD  salesPrice INTEGER
 
 CREATE TABLE stg_ArticleCodeMaster_TESTONLY (
     warehouse       NVARCHAR(20),
