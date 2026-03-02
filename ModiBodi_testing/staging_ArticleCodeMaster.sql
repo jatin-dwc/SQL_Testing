@@ -56,9 +56,9 @@ SELECT
     ELSE RRPAUD
     END AS salesPrice,
     CASE
-        WHEN w.Country IN ('Australia' , 'USA', 'NZ') then L_AUUSNZ
-        WHEN w.Country = 'UK' then L_UK
-        WHEN w.Country = 'EU' then L_EU 
+        WHEN w.region IN ('Australia' , 'USA', 'NZ') then L_AUUSNZ
+        WHEN w.region = 'UK' then L_UK
+        WHEN w.region = 'EU' then L_EU 
     ELSE L_AUUSNZ
     END AS groupCode5
 FROM 
@@ -110,16 +110,7 @@ FROM
 
 
 
-CREATE VIEW vw_Warehouse AS
-select
-    "Warehouse Code" as warehouse,
-    "Warehouse Grouping" as whsgroup,
-    Currency as currency,
-    Country as country,
-    "Slim4 Inscope?" as scope
-FROM 
-ingest_Warehouse
-WHERE "Slim4 Inscope?" = 'Y'
+
 
 
 
@@ -184,10 +175,10 @@ CREATE TABLE stg_ArticleCodes_1 (
     criterium3      INTEGER,       -- TBC
     criterium4      INTEGER,       -- TBC
     groupCode1      NVARCHAR(255), -- ProductFamily
-    groupCode2      NVARCHAR(255), -- ProductClass
+    groupCode2      NVARCHAR(255), -- ProductClass, used for Stocked/Non-Stocked - Core = Y, else N
     groupCode3      NVARCHAR(255), -- ProductLine
     groupCode4      NVARCHAR(255), -- Absobency
-    --groupCode5      NVARCHAR(255), -- Launch Date
+    groupCode5      NVARCHAR(255), -- Launch Date
     groupCode6      NVARCHAR(255), -- Colour
     uD1             NVARCHAR(255), -- Size
     uD2             NVARCHAR(255), -- CustomerName
@@ -227,13 +218,13 @@ CREATE TABLE stg_ArticleCodeMaster_TESTONLY (
     description     NVARCHAR(100),
     criterium1      INTEGER,       -- Innerbox etc.
     criterium2      INTEGER,       -- TBC
-    criterium3      INTEGER,       -- TBC
+    criterium3      INTEGER,       -- TBC  
     criterium4      INTEGER,       -- TBC
     groupCode1      NVARCHAR(255), -- ProductFamily
     groupCode2      NVARCHAR(255), -- ProductClass
     groupCode3      NVARCHAR(255), -- ProductLine
     groupCode4      NVARCHAR(255), -- Absobency
-    --groupCode5      NVARCHAR(255), -- Launch Date
+    groupCode5      NVARCHAR(255), -- Launch Date
     groupCode6      NVARCHAR(255), -- Colour
     uD1             NVARCHAR(255), -- Size
     uD2             NVARCHAR(255), -- CustomerName
