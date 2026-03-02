@@ -30,7 +30,7 @@ SELECT
     CONVERT(CHAR(8), "Launch date EU", 112) as L_EU,
     CONVERT(CHAR(8), "Launch date UK", 112) as L_UK
 FROM 
-    ArticleTest2 ) ,
+    ArticleTest4 ) ,
 
 -- Combine Warehouse Table with all Records in Master Article codes to later assign Region specifc attributes
 
@@ -133,6 +133,8 @@ FROM ArticleTest2;
 SELECT * FROM ArticleTest1
 UNION ALL
 SELECT * FROM ArticleTest2
+
+SELECT * FROM ArticleTest4
 
 TRUNCATE TABLE ArticleTest2;
 

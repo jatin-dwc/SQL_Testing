@@ -16,7 +16,7 @@ WITH Article_base AS (
             CONVERT(CHAR(8), "Launch date UK", 112)                             as L_UK,
             ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code")   AS rn
         FROM
-            ArticleTest2 ),
+            ArticleTest4 ),
 Article_Warehouse AS (
 select 
     ab.*,

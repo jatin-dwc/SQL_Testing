@@ -16,3 +16,5 @@ WHERE "Slim4Inscope" = 'Y'
 
 DROP TABLE ingest_Warehouse
 select * from  vw_Warehouse
+
+
