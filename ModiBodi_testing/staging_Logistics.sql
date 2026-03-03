@@ -1,12 +1,16 @@
 
 
+-- Clear table before writing new data
+
+TRUNCATE TABLE S4Import_Logistics;
+
 WITH Article_base AS (
         select
             CONVERT(NVARCHAR(40), CAST("Item Code" AS BIGINT))                  AS code,
             "Product Class"                                                     as productClass,              
             ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code")   AS rn
         FROM
-            ArticleTest2 ),
+            ArticleTest4 ),
 Article_Warehouse AS (
 select 
     ab.code,
