@@ -12,12 +12,13 @@ FROM
     ingest_POHistory
     
 WHERE "MB PO Number" = 'PO-HAN130625AU1'
+AND "Location" = '3PLUK UK'
 
 
 --CONVERT(CHAR(8), "Launch date EU", 112)  
 
     select 
-       c."Location Code" as warehouse,
+       c."Location" as warehouse,
         CONVERT(NVARCHAR(40), CAST(c."Item Code/Barcode"AS BIGINT)) as code,
         c."MB PO Number" as poNumber,
         CONVERT(CHAR(8),c."Estimated stock available date (ETA)" , 112) as deliveryDate,
@@ -36,9 +37,11 @@ WHERE "MB PO Number" = 'PO-HAN130625AU1'
     LEFT JOIN ingest_POHistory as h 
     ON c."Item Code/Barcode" = h."Item Code"
     AND c."MB PO Number" = h."MB PO Number"
+    AND c."Location" = h."Location"
+   -- AND c." Shipping Mode" = h." Shipping Mode" -- not always the same for specific PO
 
 WHERE h."Qty" IS NOT NULL
-AND c."MB PO Number" = 'PO-HAN130625AU1'
+--AND c."MB PO Number" = 'PO-HAN130625AU1'
      ;
 
 

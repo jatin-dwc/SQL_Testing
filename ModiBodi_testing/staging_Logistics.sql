@@ -1,4 +1,7 @@
 
+
+-- Clear table before writing new data
+
 TRUNCATE TABLE S4Import_Logistics;
 
 WITH Article_base AS (
@@ -7,7 +10,7 @@ WITH Article_base AS (
             "Product Class"                                                     as productClass,              
             ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code")   AS rn
         FROM
-            ArticleTest7 ),
+            ArticleTest2 ),
 Article_Warehouse AS (
 select 
     ab.code,
