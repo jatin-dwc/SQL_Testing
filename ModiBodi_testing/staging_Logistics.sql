@@ -1,4 +1,5 @@
 
+TRUNCATE TABLE S4Import_Logistics;
 
 WITH Article_base AS (
         select
@@ -6,7 +7,7 @@ WITH Article_base AS (
             "Product Class"                                                     as productClass,              
             ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code")   AS rn
         FROM
-            ArticleTest2 ),
+            ArticleTest7 ),
 Article_Warehouse AS (
 select 
     ab.code,
@@ -17,7 +18,9 @@ select
     w.warehouse
 FROM
     Article_base as ab
-CROSS JOIN vw_Warehouse as w )
+CROSS JOIN vw_Warehouse as w 
+WHERE ab.rn=1 
+AND ab.code IS NOT NULL )
 INSERT INTO S4Import_Logistics (controlID, warehouse, code, stockedItem)
 SELECT 
     '1' as controlID,

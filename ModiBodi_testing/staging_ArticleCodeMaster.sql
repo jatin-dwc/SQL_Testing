@@ -25,12 +25,12 @@ SELECT
     ROUND("Current RRP EUR",2 ) as RRPEUR,
     ROUND("Current RRP GBP",2 ) as RRPGBP,
     ROUND("Current RRP NZD",2 ) as RRPNZD,
-    ROUND("ONLINE USD RRP" ,2 ) as RRPUSD,
+    ROUND("Current USD RRP" ,2 ) as RRPUSD,
     CONVERT(CHAR(8), "Launch date AU-US-NZ", 112) as L_AUUSNZ,
     CONVERT(CHAR(8), "Launch date EU", 112) as L_EU,
     CONVERT(CHAR(8), "Launch date UK", 112) as L_UK
 FROM 
-    ArticleTest4 ) ,
+    ArticleTest7 ) ,
 
 -- Combine Warehouse Table with all Records in Master Article codes to later assign Region specifc attributes
 
@@ -42,7 +42,8 @@ FROM
 Article_1 as a1
 CROSS JOIN
 vw_Warehouse as w
-WHERE a1.rn=1 ) ,
+WHERE a1.rn=1 
+AND a1.code IS NOT NULL) ,
 
 Art_WHS_Price AS (
 SELECT 
@@ -58,7 +59,7 @@ SELECT
     CASE
         WHEN w.region IN ('Australia' , 'USA', 'NZ') then L_AUUSNZ
         WHEN w.region = 'UK' then L_UK
-        WHEN w.region = 'EU' then L_EU 
+        WHEN w.region = 'Europe' then L_EU 
     ELSE L_AUUSNZ
     END AS groupCode5
 FROM 
@@ -75,9 +76,10 @@ ON aw.warehouse = w.warehouse
 -- Also need to keep in mind that this table will need to be filtered to adhere to the ArticleFilter requirements
 -- Need to add a date table to start with the ArticleFitler process.
 
-INSERT INTO stg_ArticleCodeMaster_TestOnly ( warehouse, code,creationDate,description,salesPrice,criterium1,criterium2,
+INSERT INTO stg_ArticleCodeMaster_TestOnly ( controlID, warehouse, code,creationDate,description,salesPrice,criterium1,criterium2,
                                 criterium3,criterium4,groupCode1,groupCode2,groupCode3,groupCode4,groupCode5,groupCode6,uD1,uD2,uD3)
 SELECT
+    '1' as controlID,
     warehouse,
     code,
     creationDate,
@@ -128,15 +130,15 @@ WHERE Country = 'Japan';
 select * from ingest_Warehouse
 
 select *
-FROM ArticleTest2;
+FROM ArticleTest7;
 
-SELECT * FROM ArticleTest1
+SELECT * FROM ArticleTest7
 UNION ALL
-SELECT * FROM ArticleTest2
+SELECT * FROM ArticleTest6 ;
 
-SELECT * FROM ArticleTest4
+SELECT * FROM ArticleTest6;
 
-TRUNCATE TABLE ArticleTest2;
+TRUNCATE TABLE ArticleTest6;
 
 
 INSERT INTO ArticleTest2 ( "Product Class", "Description", "Item Code", "Colour", "Size", "Current RRP AUD", "Current RRP GBP", "Current RRP EUR", "Current RRP NZD", "Launch date AU-US-NZ", "Launch date UK", "Launch date EU", "SKU created/updated", "PRODUCT FAMILY", "PRODUCT LINE", "ABSORBENCY", "Customer name", "ACTIVE SKUS", "ONLINE USD RRP" )
@@ -165,38 +167,10 @@ CONVERT(NVARCHAR(50), CAST("Item Code" AS BIGINT)) AS "Item Code",
 from ArticleTest1
 
 
+DROP TABLE stg_ArticleCodeMaster_TESTONLY 
 
+SELECT * from stg_ArticleCodeMaster_TESTONLY
 
-
-CREATE TABLE stg_ArticleCodes_1 (
-    code            NVARCHAR(40),
-    creationDate    CHAR(8),
-    description     NVARCHAR(100),
-    criterium1      INTEGER,       -- Innerbox etc.
-    criterium2      INTEGER,       -- TBC
-    criterium3      INTEGER,       -- TBC
-    criterium4      INTEGER,       -- TBC
-    groupCode1      NVARCHAR(255), -- ProductFamily
-    groupCode2      NVARCHAR(255), -- ProductClass, used for Stocked/Non-Stocked - Core = Y, else N
-    groupCode3      NVARCHAR(255), -- ProductLine
-    groupCode4      NVARCHAR(255), -- Absobency
-    groupCode5      NVARCHAR(255), -- Launch Date
-    groupCode6      NVARCHAR(255), -- Colour
-    uD1             NVARCHAR(255), -- Size
-    uD2             NVARCHAR(255), -- CustomerName
-    uD3             NVARCHAR(255) -- ArticleStatus
-);
-
-
-
-SELECT * from stg_ArticleCodes_1
-
-
-ALTER TABLE stg_ArticleCodes_1
-DROP COLUMN groupCode5
-
-ALTER TABLE stg_ArticleCodes_1
-ALTER COLUMN code NVARCHAR(40)
 
 ALTER TABLE ArticleTest2
 ALTER COLUMN "Item Code" NVARCHAR (40)
@@ -232,3 +206,144 @@ CREATE TABLE stg_ArticleCodeMaster_TESTONLY (
     uD2             NVARCHAR(255), -- CustomerName
     uD3             NVARCHAR(255) -- ArticleStatus
 );
+
+CREATE TABLE stg_ArticleCodeMaster_TESTONLY (
+    controlID  INTEGER, 
+    warehouse  NVARCHAR(20), 
+    code  NVARCHAR(40), 
+    creationDate  CHAR(8), 
+    description  NVARCHAR(100), 
+    unitPrice  FLOAT, 
+    salesPrice  FLOAT, 
+    criterium1  FLOAT, 
+    criterium2  FLOAT, 
+    criterium3  FLOAT, 
+    criterium4  FLOAT, 
+    groupCode1  NVARCHAR(255), 
+    groupCode2  NVARCHAR(255), 
+    groupCode3  NVARCHAR(255), 
+    groupCode4  NVARCHAR(255), 
+    groupCode5  NVARCHAR(255), 
+    groupCode6  NVARCHAR(255), 
+    uD1  NVARCHAR(255), 
+    uD2  NVARCHAR(255), 
+    uD3  NVARCHAR(255), 
+    uD4  NVARCHAR(255), 
+    uD5  NVARCHAR(255), 
+    uD6  NVARCHAR(255), 
+    uD7  NVARCHAR(255), 
+    uD8  NVARCHAR(255), 
+    uD9  NVARCHAR(255), 
+    uD10  NVARCHAR(255), 
+    uD11  NVARCHAR(255), 
+    uD12  NVARCHAR(255), 
+    uD13  NVARCHAR(255), 
+    uD14  NVARCHAR(255), 
+    uD15  NVARCHAR(255), 
+    aUDField1  NVARCHAR(255), 
+    aUDField2  NVARCHAR(255), 
+    aUDField3  NVARCHAR(255), 
+    aUDField4  NVARCHAR(255), 
+    aUDField5  NVARCHAR(255), 
+    aUDField6  NVARCHAR(255), 
+    aUDField7  NVARCHAR(255), 
+    aUDField8  NVARCHAR(255), 
+    aUDField9  NVARCHAR(255), 
+    aUDField10  NVARCHAR(255), 
+    aUDField11  NVARCHAR(255), 
+    aUDField12  NVARCHAR(255), 
+    aUDField13  NVARCHAR(255), 
+    aUDField14  NVARCHAR(255), 
+    aUDField15  NVARCHAR(255), 
+    aUDField16  NVARCHAR(255), 
+    aUDField17  NVARCHAR(255), 
+    aUDField18  NVARCHAR(255), 
+    aUDField19  NVARCHAR(255), 
+    aUDField20  NVARCHAR(255), 
+    aUDField21  NVARCHAR(255), 
+    aUDField22  NVARCHAR(255), 
+    aUDField23  NVARCHAR(255), 
+    aUDField24  NVARCHAR(255), 
+    aUDField25  NVARCHAR(255), 
+    aUDField26  NVARCHAR(255), 
+    aUDField27  NVARCHAR(255), 
+    aUDField28  NVARCHAR(255), 
+    aUDField29  NVARCHAR(255), 
+    aUDField30  NVARCHAR(255), 
+    aUDField31  NVARCHAR(255), 
+    aUDField32  NVARCHAR(255), 
+    aUDField33  NVARCHAR(255), 
+    aUDField34  NVARCHAR(255), 
+    aUDField35  NVARCHAR(255), 
+    aUDField36  NVARCHAR(255), 
+    aUDField37  NVARCHAR(255), 
+    aUDField38  NVARCHAR(255), 
+    aUDField39  NVARCHAR(255),
+    aUDField40  NVARCHAR(255), 
+    aUDField41  NVARCHAR(255), 
+    aUDField42  NVARCHAR(255), 
+    aUDField43  NVARCHAR(255), 
+    aUDField44  NVARCHAR(255), 
+    aUDField45  NVARCHAR(255), 
+    aUDField46  NVARCHAR(255), 
+    aUDField47  NVARCHAR(255), 
+    aUDField48  NVARCHAR(255), 
+    aUDField49  NVARCHAR(255), 
+    aUDField50  NVARCHAR(255), 
+    aUDField51  NVARCHAR(255), 
+    aUDField52  NVARCHAR(255), 
+    aUDField53  NVARCHAR(255), 
+    aUDField54  NVARCHAR(255), 
+    aUDField55  NVARCHAR(255), 
+    aUDField56  NVARCHAR(255), 
+    aUDField57  NVARCHAR(255), 
+    aUDField58  NVARCHAR(255), 
+    aUDField59  NVARCHAR(255), 
+    aUDField60  NVARCHAR(255), 
+    aUDField61  NVARCHAR(255), 
+    aUDField62  NVARCHAR(255), 
+    aUDField63  NVARCHAR(255), 
+    aUDField64  NVARCHAR(255), 
+    aUDField65  NVARCHAR(255), 
+    aUDField66  NVARCHAR(255), 
+    aUDField67  NVARCHAR(255), 
+    aUDField68  NVARCHAR(255), 
+    aUDField69  NVARCHAR(255), 
+    aUDField70  NVARCHAR(255), 
+    aUDField71  NVARCHAR(255), 
+    aUDField72  NVARCHAR(255), 
+    aUDField73  NVARCHAR(255), 
+    aUDField74  NVARCHAR(255), 
+    aUDField75  NVARCHAR(255), 
+    aUDField76  NVARCHAR(255), 
+    aUDField77  NVARCHAR(255), 
+    aUDField78  NVARCHAR(255), 
+    aUDField79  NVARCHAR(255), 
+    aUDField80  NVARCHAR(255), 
+    aUDField81  NVARCHAR(255), 
+    aUDField82  NVARCHAR(255), 
+    aUDField83  NVARCHAR(255), 
+    aUDField84  NVARCHAR(255), 
+    aUDField85  NVARCHAR(255), 
+    aUDField86  NVARCHAR(255), 
+    aUDField87  NVARCHAR(255), 
+    aUDField88  NVARCHAR(255), 
+    aUDField89  NVARCHAR(255), 
+    aUDField90  NVARCHAR(255), 
+    aUDField91  NVARCHAR(255), 
+    aUDField92  NVARCHAR(255), 
+    aUDField93  NVARCHAR(255), 
+    aUDField94  NVARCHAR(255), 
+    aUDField95  NVARCHAR(255), 
+    aUDField96  NVARCHAR(255), 
+    aUDField97  NVARCHAR(255), 
+    aUDField98  NVARCHAR(255), 
+    aUDField99  NVARCHAR(255), 
+    aUDField100  NVARCHAR(255), 
+    articleStatus  NVARCHAR(100), 
+    barCode  NVARCHAR(20), 
+    fefoPercentage  FLOAT, 
+    criterium5  FLOAT, 
+    criterium6  FLOAT, 
+    criterium7  FLOAT, 
+    criterium8  FLOAT )

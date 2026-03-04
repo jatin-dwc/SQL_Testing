@@ -5,7 +5,7 @@
 CREATE VIEW vw_Warehouse AS
 select
     "WarehouseCode" as warehouse,
-    "WarehouseGrouping" as whsgroup,
+    "WarehouseLocation" as "location",
     Currency as currency,
     Region as region,
     "Slim4Inscope" as scope       -- Column name may not be the same
@@ -14,7 +14,8 @@ ingest_Warehouse                -- Replace this with scheduled table that gets i
 WHERE "Slim4Inscope" = 'Y'
 
 
+/*
+
 DROP TABLE ingest_Warehouse
 select * from  vw_Warehouse
-
-
+*/
