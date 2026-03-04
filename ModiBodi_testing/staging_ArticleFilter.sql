@@ -16,7 +16,9 @@ WITH Article_base AS (
             CONVERT(CHAR(8), "Launch date UK", 112)                             as L_UK,
             ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code")   AS rn
         FROM
-            ArticleTest4 ),
+            ArticleTest7
+            WHERE "ACTIVE SKUS" = 'YES'
+             ),
 Article_Warehouse AS (
 select 
     ab.*,
@@ -33,7 +35,7 @@ SELECT
     CASE
         WHEN w.region IN ('Australia' , 'USA', 'NZ') then aw.L_AUUSNZ
         WHEN w.region = 'UK' then aw.L_UK
-        WHEN w.region = 'EU' then aw.L_EU 
+        WHEN w.region = 'Europe' then aw.L_EU 
     ELSE aw.L_AUUSNZ
     END AS launchdate
 FROM 

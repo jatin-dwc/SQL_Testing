@@ -30,7 +30,9 @@ SELECT
     CONVERT(CHAR(8), "Launch date EU", 112) as L_EU,
     CONVERT(CHAR(8), "Launch date UK", 112) as L_UK
 FROM 
-    ArticleTest7 ) ,
+    ArticleTest7
+WHERE "ACTIVE SKUS" = 'YES'
+     ) ,
 
 -- Combine Warehouse Table with all Records in Master Article codes to later assign Region specifc attributes
 

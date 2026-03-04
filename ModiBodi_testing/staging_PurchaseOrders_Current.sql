@@ -1,18 +1,18 @@
 select  *
 FROM
-    ingest_POCurrent
+    ingest_POCurrent ;
 
     select  *
 FROM
     ingest_POCurrent
-    WHERE "MB PO Number" = 'PO-HAN130625AU1'
+    WHERE "MB PO Number" = 'PO-HAN130625AU1' ;
 
 select  *
 FROM
     ingest_POHistory
     
 WHERE "MB PO Number" = 'PO-HAN130625AU1'
-AND "Location" = '3PLUK UK'
+AND "Location" = '3PLUK UK';
 
 
 --CONVERT(CHAR(8), "Launch date EU", 112)  

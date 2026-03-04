@@ -10,7 +10,8 @@ WITH Article_base AS (
             "Product Class"                                                     as productClass,              
             ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code")   AS rn
         FROM
-            ArticleTest2 ),
+            ArticleTest7
+            WHERE "ACTIVE SKUS" = 'YES' ),
 Article_Warehouse AS (
 select 
     ab.code,

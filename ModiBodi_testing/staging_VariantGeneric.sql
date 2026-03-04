@@ -1,4 +1,4 @@
-select * from ArticleTest4;
+select * from ArticleTest7;
 
 select * from ingest_SizeOrder;
 
@@ -13,9 +13,10 @@ WITH Article_base AS (
             '1'                                                              as core,
             ROW_NUMBER() OVER (PARTITION BY "Child SKU" ORDER BY "Child SKU")   AS rn
         FROM
-            ArticleTest4
+            ArticleTest7
     LEFT JOIN ingest_SizeOrder as s  
     ON s.SizeCode = Size
+    WHERE "ACTIVE SKUS" = 'YES'
 )
 SELECT 
     '1' as controlID,

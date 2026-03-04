@@ -12,10 +12,10 @@ WHERE DayOffset BETWEEN -3 and 0; -- Interchange between - 3 days (BETWEEN -3 an
 
 -- Create View for Last X Days
 
-CREATE VIEW vw_Last_XMonths AS  --  vw_Last_XDays ; vw_Last_XMonths 
+CREATE VIEW vw_Last_XDays AS  --  vw_Last_XDays ; vw_Last_XMonths 
 SELECT *
 FROM dim_Date
-WHERE DayOffset >= -366;
+WHERE DayOffset >= -14;
 
 
 
