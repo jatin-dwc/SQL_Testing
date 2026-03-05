@@ -9,7 +9,7 @@ WITH Article_base AS (
             "Parent SKU"                                                        as genericCode,
             "Description"                                                       as genericName,
             s.SizeOrder                                                         as variantNumber,
-            "Combo"                                                             as variantName,
+            LEFT("Combo" , 15 )                                                 as variantName,
             '1'                                                                 as core,
             ROW_NUMBER() OVER (PARTITION BY "Child SKU" ORDER BY "Child SKU")   AS rn
         FROM
@@ -18,7 +18,7 @@ WITH Article_base AS (
     ON s.SizeCode = Size
     WHERE "ACTIVE SKUS" = 'YES'
 )
-INSERT INTO S4Import_VariantGeneric (controlID,  variantCode, genericCode, genericName, variantNumber, variantName, code )
+INSERT INTO S4Import_VariantGeneric (controlID,  variantCode, genericCode, genericName, variantNumber, variantName, core )
 SELECT 
     '1' as controlID,
     variantCode,
@@ -33,7 +33,7 @@ SELECT
         AND variantCode IS NOT NULL ;
 
 -- Setup queries 
-
+/*
 CREATE TABLE S4Import_VariantGeneric (
     controlID  INTEGER, 
     variantCode  NVARCHAR(40), 
@@ -42,5 +42,5 @@ CREATE TABLE S4Import_VariantGeneric (
     variantNumber  INTEGER, 
     variantName  NVARCHAR(15), 
     core  INTEGER
-)
+) */
 

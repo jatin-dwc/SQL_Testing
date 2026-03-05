@@ -47,7 +47,7 @@ supplierName, buyingPrice )
         buyingPrice
     FROM 
         HistoricalPO
-    WHERE warehouse IS NULL
+    WHERE warehouse IS NOT NULL
         ;
 
 -- Setup queries below
@@ -61,3 +61,4 @@ freeText2  NVARCHAR(255), freeNumber1  FLOAT, freeNumber2  FLOAT, orderedDate  N
 requestedDate  NVARCHAR(10), orderedQuantity  INTEGER, requestedQuantity  INTEGER, confirmedQuantity  INTEGER, 
 confirmedDate  NVARCHAR(10), supplierNumber  NVARCHAR(60), supplierName  NVARCHAR(100), buyingPrice  FLOAT
 )
+*/
