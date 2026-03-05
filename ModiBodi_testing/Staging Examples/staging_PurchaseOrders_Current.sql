@@ -5,14 +5,22 @@ FROM
     select  *
 FROM
     ingest_POCurrent
+    /*WHERE "BC PO # (For Finance Team) " = 'P-ORD-0002148'
+    AND "Item Code/Barcode" = '29351343049085'
+    --WHERE "Supplier's Inv# Number" IS NOT NULL
+    WHERE "BC PO # (For Finance Team) " IS NOT NULL */
     WHERE "MB PO Number" = 'PO-HAN130625AU1' ;
 
 select  *
 FROM
     ingest_POHistory
-    
+/*
+    WHERE "BC PO # (For Finance Team) " = 'P-ORD-0002148'
+    WHERE "BC PO # (For Finance Team) " IS NOT NULL
+    WHERE "Supplier's Inv# Number" IS NOT NULL
+    */
 WHERE "MB PO Number" = 'PO-HAN130625AU1'
--- AND "Location" = '3PLUK UK';
+AND "Location" = '3PLUK UK';
 
 
 select  " FOB"
@@ -43,10 +51,10 @@ FROM
     ON c."Item Code/Barcode" = h."Item Code"
     AND c."MB PO Number" = h."MB PO Number"
     AND c."Location" = h."Location"
-   -- AND c." Shipping Mode" = h." Shipping Mode" -- not always the same for specific PO
-
-WHERE h."Qty" IS NOT NULL
+  --  AND c."BC PO # (For Finance Team) " = h."BC PO # (For Finance Team) "
+-- WHERE h."Qty" IS NOT NULL
 --AND c."MB PO Number" = 'PO-HAN130625AU1'
+WHERE c."BC PO # (For Finance Team) " = 'P-ORD-0002148'
      ;
 
 

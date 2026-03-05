@@ -1,5 +1,7 @@
 
 
+-- Slim4 Import Tables
+
 select * from S4Import_VariantGeneric ;
 
 select * from  S4Import_ArticleCodeMaster ;
@@ -14,9 +16,29 @@ select * from S4Import_PurchaseOrder
 select * from S4Import_Historical_PO
 WHERE warehouse IS NULL ;
 
+-- Supporting Tables 
+
 select * from vw_Warehouse ;
 
 select * from vw_location_warehouse ;
+
+--  Ingestion tables testing
+
+    select  
+    *
+    FROM
+        ingest_POCurrent
+    WHERE "Supplier's Inv# Number" IS NOT NULL
+    WHERE "MB PO Number" = 'PO-HAN130625AU1' ;
+
+    select  
+    *
+    FROM
+        ingest_POHistory
+    
+WHERE "MB PO Number" = 'PO-HAN130625AU1'
+-- AND "Location" = '3PLUK UK';
+
 
 -- Testing Queries below
 
@@ -31,7 +53,7 @@ WHERE LEN(Combo) <= 15
 
 select * from ingest_POHistory ;
 
--- Location Quantity Checks
+-- Location Quantity Checks to show which Locations exist in the Input for Hisorical POs but are not being mapped
 
 WITH unique_location AS (
     select 
