@@ -11,7 +11,31 @@ select
     "Slim4Inscope" as scope       -- Column name may not be the same
 FROM 
 ingest_Warehouse                -- Replace this with scheduled table that gets imported
-WHERE "Slim4Inscope" = 'Y'
+WHERE "Slim4Inscope" = 'Y' ;
+
+
+
+CREATE VIEW vw_Location_Warehouse AS 
+SELECT
+    "Location" as location,
+    "WarehouseLocation" as warehousename,
+    code as warehouse
+FROM
+    ingest_WHS_location
+    ;
+
+
+ALTER VIEW vw_Location_Warehouse AS 
+SELECT
+    "Location" as location,
+    "WarehouseLocation" as warehousename,
+    code as warehouse
+FROM
+    ingest_WHS_location
+WHERE code IS NOT NULL;
+
+
+select * from vw_Location_Warehouse
 
 
 /*

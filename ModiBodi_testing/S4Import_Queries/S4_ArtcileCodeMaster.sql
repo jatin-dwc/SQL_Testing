@@ -76,7 +76,7 @@ ON aw.warehouse = w.warehouse
 -- Also need to keep in mind that this table will need to be filtered to adhere to the ArticleFilter requirements
 -- Need to add a date table to start with the ArticleFitler process.
 
-INSERT INTO S4Import_ArticleCodeMaster ( controlID, warehouse, code,creationDate,description,salesPrice,criterium1,criterium2,
+INSERT INTO S4Import_ArticleCodeMaster ( controlID, warehouse, code, creationDate, description, salesPrice,criterium1,criterium2,
                                 criterium3,criterium4,groupCode1,groupCode2,groupCode3,groupCode4,groupCode5,groupCode6,uD1,uD2,uD3)
 SELECT
     '1' as controlID,

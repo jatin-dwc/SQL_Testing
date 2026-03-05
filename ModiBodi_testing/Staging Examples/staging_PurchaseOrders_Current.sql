@@ -12,7 +12,12 @@ FROM
     ingest_POHistory
     
 WHERE "MB PO Number" = 'PO-HAN130625AU1'
-AND "Location" = '3PLUK UK';
+-- AND "Location" = '3PLUK UK';
+
+
+select  " FOB"
+FROM
+    ingest_POHistory
 
 
 --CONVERT(CHAR(8), "Launch date EU", 112)  

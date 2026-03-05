@@ -1,5 +1,7 @@
 
+-- Clear table before writing new data
 
+TRUNCATE TABLE S4Import_VariantGeneric;
 
 WITH Article_base AS (
         select
@@ -16,6 +18,7 @@ WITH Article_base AS (
     ON s.SizeCode = Size
     WHERE "ACTIVE SKUS" = 'YES'
 )
+INSERT INTO S4Import_VariantGeneric (controlID,  variantCode, genericCode, genericName, variantNumber, variantName, code )
 SELECT 
     '1' as controlID,
     variantCode,
@@ -26,8 +29,8 @@ SELECT
     core
     from
     Article_base
-WHERE rn = 1
-AND variantCode IS NOT NULL
+        WHERE rn = 1
+        AND variantCode IS NOT NULL ;
 
 -- Setup queries 
 
@@ -36,6 +39,8 @@ CREATE TABLE S4Import_VariantGeneric (
     variantCode  NVARCHAR(40), 
     genericCode  NVARCHAR(40), 
     genericName  NVARCHAR(255), 
-    variantNumber  INTEGER
+    variantNumber  INTEGER, 
+    variantName  NVARCHAR(15), 
+    core  INTEGER
 )
 

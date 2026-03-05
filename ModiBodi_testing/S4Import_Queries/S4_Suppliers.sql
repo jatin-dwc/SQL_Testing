@@ -1,5 +1,10 @@
 
 
+INSERT INTO S4Import_Suppliers ( controlID, warehouse, code, supplierNumber, supplierName, primarySupplier , leadTime, reviewTime, buyingPrice, currencyCode, minimumOrderQuantity, incrementelOrderQuantity )
+SELECT 
+    '1'         as controlID,
+FROM 
+    Suppliers
 
 
 -- Setup queries below
