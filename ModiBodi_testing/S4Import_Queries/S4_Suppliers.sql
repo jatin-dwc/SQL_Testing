@@ -1,0 +1,52 @@
+
+
+
+
+-- Setup queries below
+
+CREATE TABLE S4Import_Suppliers (
+
+controlID  INTEGER, 
+warehouse  NVARCHAR(20), 
+code  NVARCHAR(40), 
+supplierNumber  NVARCHAR(60), 
+supplierName  NVARCHAR(100), 
+primarySupplier  INTEGER, 
+preference  INTEGER, 
+leadTime  FLOAT, 
+reviewTime  FLOAT, 
+buyingPrice  FLOAT, 
+currencyCode  NVARCHAR(3), 
+minimumOrderQuantity  INTEGER, 
+incrementelOrderQuantity  INTEGER, 
+economicOrderQuantity  INTEGER, 
+supplierReliability  FLOAT, 
+supplierReliabilitySetting  INTEGER, 
+supplierArticleCode  NVARCHAR(65), 
+availableInventory  INTEGER, 
+desiredSplit  FLOAT, 
+suppliedQuantity  INTEGER, 
+orderFromDate  CHAR(8), 
+orderToDate  CHAR(8), 
+logisticUnit1  INTEGER, 
+logisticUnit2  INTEGER, 
+logisticUnit3  INTEGER, 
+logisticUnit4  INTEGER, 
+logisticUnit5  INTEGER, 
+logisticUnit6  INTEGER, 
+uD1  NVARCHAR(255), 
+uD2  NVARCHAR(255), 
+uD3  NVARCHAR(255), 
+uD4  NVARCHAR(255), 
+uD5  NVARCHAR(255), 
+replenishmentScheduleId  NVARCHAR(60), 
+inboundGuaranteedShelfLife  FLOAT, 
+outboundGuaranteedShelfLife  FLOAT, 
+netShelfLife  FLOAT, 
+nonStocked  NVARCHAR(25), 
+totalInventory  NVARCHAR(25), 
+uDNum1  NVARCHAR(25), 
+uDNum2  NVARCHAR(25), 
+uDNum3  NVARCHAR(25), 
+uDNum4  NVARCHAR(25), 
+uDNum5  NVARCHAR(25) )

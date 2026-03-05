@@ -1,6 +1,4 @@
-select * from ArticleTest7;
 
-select * from ingest_SizeOrder;
 
 
 WITH Article_base AS (
@@ -13,7 +11,7 @@ WITH Article_base AS (
             '1'                                                                 as core,
             ROW_NUMBER() OVER (PARTITION BY "Child SKU" ORDER BY "Child SKU")   AS rn
         FROM
-            ArticleTest7
+            ArticleTest7                        --- REPLACE WITH SQL TABLE
     LEFT JOIN ingest_SizeOrder as s  
     ON s.SizeCode = Size
     WHERE "ACTIVE SKUS" = 'YES'
@@ -30,4 +28,14 @@ SELECT
     Article_base
 WHERE rn = 1
 AND variantCode IS NOT NULL
-;
+
+-- Setup queries 
+
+CREATE TABLE S4Import_VariantGeneric (
+    controlID  INTEGER, 
+    variantCode  NVARCHAR(40), 
+    genericCode  NVARCHAR(40), 
+    genericName  NVARCHAR(255), 
+    variantNumber  INTEGER
+)
+

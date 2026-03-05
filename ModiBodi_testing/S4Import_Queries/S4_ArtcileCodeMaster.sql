@@ -30,7 +30,7 @@ SELECT
     CONVERT(CHAR(8), "Launch date EU", 112) as L_EU,
     CONVERT(CHAR(8), "Launch date UK", 112) as L_UK
 FROM 
-    ArticleTest7
+    ArticleTest7                        --- REPLACE WITH SQL TABLE
 WHERE "ACTIVE SKUS" = 'YES'
      ) ,
 
@@ -68,9 +68,7 @@ FROM
     Art_WHS AS aw 
 INNER JOIN vw_Warehouse as w 
 ON aw.warehouse = w.warehouse
-
 )
-
 
 
 -- Update ArticleCodeMaster Table
@@ -105,110 +103,8 @@ FROM
 
 
 
-
-
-
--- Testing code below ONLY
-
-
-
-
-
-
-
-
-
-DROP TABLE stg_ArticleCodes_1
-
-UPDATE ingest_Warehouse
-SET Country = 'UK'
-WHERE Country = 'United Kingdom'
-
-UPDATE ingest_Warehouse
-SET "Slim4 Inscope?" = 'N'
-WHERE Country = 'Japan';
-
-
-select * from ingest_Warehouse
-
-select *
-FROM ArticleTest7;
-
-SELECT * FROM ArticleTest7
-UNION ALL
-SELECT * FROM ArticleTest6 ;
-
-SELECT * FROM ArticleTest6;
-
-TRUNCATE TABLE ArticleTest6;
-
-
-INSERT INTO ArticleTest2 ( "Product Class", "Description", "Item Code", "Colour", "Size", "Current RRP AUD", "Current RRP GBP", "Current RRP EUR", "Current RRP NZD", "Launch date AU-US-NZ", "Launch date UK", "Launch date EU", "SKU created/updated", "PRODUCT FAMILY", "PRODUCT LINE", "ABSORBENCY", "Customer name", "ACTIVE SKUS", "ONLINE USD RRP" )
-SELECT 
-"Product Class" as "Product Class", 
-"Description" as"Description" ,
-CONVERT(NVARCHAR(50), CAST("Item Code" AS BIGINT)) AS "Item Code",
- "Colour" as  "Colour",
-  "Size" as "Size", 
-  "Current RRP AUD" as "Current RRP AUD",
-   "Current RRP GBP" as "Current RRP GBP",
-    "Current RRP EUR" as "Current RRP EUR",
-     "Current RRP NZD" as "Current RRP NZD",
-      "Launch date AU-US-NZ" as "Launch date AU-US-NZ", 
-      "Launch date UK" as  "Launch date UK",
-       "Launch date EU" as  "Launch date EU",
-        "SKU created/updated" as  "SKU created/updated",
-         "PRODUCT FAMILY" as  "PRODUCT FAMILY",
-          "PRODUCT LINE" as "PRODUCT LINE",
-           "ABSORBENCY" as"ABSORBENCY",
-            "Customer name" as  "Customer name", 
-            "ACTIVE SKUS" as  "ACTIVE SKUS",
-             "ONLINE USD RRP" as  "ONLINE USD RRP"
-
-
-from ArticleTest1
-
-
-DROP TABLE stg_ArticleCodeMaster_TESTONLY 
-
-SELECT * from S4Import_ArticleCodeMaster;
-
-
-ALTER TABLE ArticleTest2
-ALTER COLUMN "Item Code" NVARCHAR (40)
-
-ALTER TABLE stg_ArticleCodeMaster_TESTONLY
-ALTER COLUMN salesPrice FLOAT
-
--- Create Test for ArticleCodeMaster
-
-ALTER TABLE stg_ArticleCodeMaster_TESTONLY
-ADD  groupCode5 NVARCHAR(255)
-
-ALTER TABLE stg_ArticleCodeMaster_TESTONLY
-ADD  salesPrice INTEGER
-
-
-CREATE TABLE stg_ArticleCodeMaster_TESTONLY (
-    warehouse       NVARCHAR(20),
-    code            NVARCHAR(40),
-    creationDate    CHAR(8),
-    description     NVARCHAR(100),
-    criterium1      INTEGER,       -- Innerbox etc.
-    criterium2      INTEGER,       -- TBC
-    criterium3      INTEGER,       -- TBC  
-    criterium4      INTEGER,       -- TBC
-    groupCode1      NVARCHAR(255), -- ProductFamily
-    groupCode2      NVARCHAR(255), -- ProductClass
-    groupCode3      NVARCHAR(255), -- ProductLine
-    groupCode4      NVARCHAR(255), -- Absobency
-    groupCode5      NVARCHAR(255), -- Launch Date
-    groupCode6      NVARCHAR(255), -- Colour
-    uD1             NVARCHAR(255), -- Size
-    uD2             NVARCHAR(255), -- CustomerName
-    uD3             NVARCHAR(255) -- ArticleStatus
-);
-
+-- Setup queries below
+/*
 CREATE TABLE S4Import_ArticleCodeMaster (
     controlID  INTEGER, 
     warehouse  NVARCHAR(20), 

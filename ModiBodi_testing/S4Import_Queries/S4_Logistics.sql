@@ -9,7 +9,7 @@ WITH Article_base AS (
             "Product Class"                                                     as productClass,              
             ROW_NUMBER() OVER (PARTITION BY "Item Code" ORDER BY "Item Code")   AS rn
         FROM
-            ArticleTest7
+            ArticleTest7                        --- REPLACE WITH SQL TABLE
             WHERE "ACTIVE SKUS" = 'YES' ),
 Article_Warehouse AS (
 select 
@@ -33,13 +33,11 @@ SELECT
 FROM 
     Article_Warehouse;
 
-
-    select * from S4Import_Logistics
-
 -- Setup queries below
 
 -- Only use if errors arise -- DROP TABLE S4Import_Logistics;
 
+/* Run Once 
 CREATE TABLE S4Import_Logistics(
 controlID INTEGER,
 warehouse NVARCHAR(20),
