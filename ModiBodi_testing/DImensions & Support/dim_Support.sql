@@ -25,6 +25,22 @@ FROM
     ;
 
 
+CREATE VIEW vw_Customers AS 
+SELECT
+    "CustomerNumber",
+    "CustomerName",
+    "CustomerType",
+    "WarehouseCode",
+    "Slim4Inscope"
+FROM
+    ingest_Customers
+WHERE "Slim4Inscope" = 'Y'
+    ;
+
+select * from vw_Customers
+
+
+
 ALTER VIEW vw_Location_Warehouse AS 
 SELECT
     "Location" as location,

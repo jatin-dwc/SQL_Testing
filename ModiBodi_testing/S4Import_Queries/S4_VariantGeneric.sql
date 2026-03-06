@@ -9,7 +9,7 @@ WITH Article_base AS (
             "Parent SKU"                                                        as genericCode,
             "Description"                                                       as genericName,
             s.SizeOrder                                                         as variantNumber,
-            LEFT("Combo" , 15 )                                                 as variantName,
+            LEFT( Size , 15 )                                                   as variantName,
             '1'                                                                 as core,
             ROW_NUMBER() OVER (PARTITION BY "Child SKU" ORDER BY "Child SKU")   AS rn
         FROM

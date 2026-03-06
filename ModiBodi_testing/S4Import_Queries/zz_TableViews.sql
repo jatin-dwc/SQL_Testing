@@ -22,7 +22,26 @@ select * from vw_Warehouse ;
 
 select * from vw_location_warehouse ;
 
+select * from vw_Last_XMonths ;
+
 --  Ingestion tables testing
+
+select *
+FROM
+    AMZ_Orders
+
+select *
+from 
+ArticleTest7 ;
+
+select 
+DISTINCT( [Size])
+from 
+ArticleTest7 ;
+
+select *,
+    LEN(SizeCode) as length
+ from ingest_SizeOrder ;
 
     select  
     *
