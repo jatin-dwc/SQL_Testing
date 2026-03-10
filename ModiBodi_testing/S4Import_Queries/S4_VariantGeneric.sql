@@ -10,10 +10,13 @@ WITH Article_base AS (
             "Description"                                                       as genericName,
             s.SizeOrder                                                         as variantNumber,
             LEFT( Size , 15 )                                                   as variantName,
-            '1'                                                                 as core,
+            CASE   
+            WHEN "Product Class" = 'Core' then 1
+            ELSE 0
+            END AS core,
             ROW_NUMBER() OVER (PARTITION BY "Child SKU" ORDER BY "Child SKU")   AS rn
         FROM
-            ArticleTest7                        --- REPLACE WITH SQL TABLE
+            ArticleTest7                        --- REPLACE WITH SQL TABLE, this needs to be the final table
     LEFT JOIN ingest_SizeOrder as s  
     ON s.SizeCode = Size
     WHERE "ACTIVE SKUS" = 'YES'

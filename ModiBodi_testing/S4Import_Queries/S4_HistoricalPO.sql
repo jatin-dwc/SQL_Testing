@@ -8,7 +8,7 @@ select
         w.warehouse as warehouse,
         CONVERT(NVARCHAR(40), CAST(c."Item Code"AS BIGINT)) as code,
         c."MB PO Number" as poNumber,
-        '3' as line,
+        "Line #" as line,
         '1' as orderTypeNumber,         -- 1 = PO , 2 = Transfer Order -- Transfer orders in a separate file
         CONVERT(CHAR(8),"Good Received Date" , 112) as deliveredDate,
         Quantity as deliveredQuantity,
@@ -16,14 +16,15 @@ select
         CONVERT(CHAR(8),"PO RAISED DATE" , 112)  as orderedDate,
         CONVERT(CHAR(8),"Original ex fty" , 112)  as requestedDate,
         Qty as orderedQuantity,
-        '3' as requestedQuantity,
-        'Production to provide' as supplierNumber,
+        Qty as requestedQuantity,  -- Need to fix this line once review with Purchase order table is vetted
+        "Supplier Number" as supplierNumber,
         Supplier as supplierName,
         " FOB" as buyingPrice
     FROM 
     ingest_POHistory as c 
     LEFT JOIN vw_location_warehouse as w
-   ON w.location = c.Location )
+   ON w.location = c.Location
+   )
 
 INSERT INTO S4Import_Historical_PO ( controlID, warehouse, code, poNumber, line, orderTypeNumber, deliveredDate, 
 deliveredQuantity, supplierDetails, orderedDate, requestedDate, orderedQuantity, requestedQuantity, supplierNumber, 

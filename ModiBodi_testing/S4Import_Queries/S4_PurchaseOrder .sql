@@ -3,6 +3,8 @@
 
 TRUNCATE TABLE S4Import_PurchaseOrder ;
 
+-- Current Purchase Order table creation
+
 WITH CurrentPO AS (
 select 
         w.warehouse as warehouse,
@@ -12,27 +14,33 @@ select
         c."Qty" as openQuantity,
         c."order reference- EG- Oct 26 seasonal/NPD/July 26 Core" as poComment,
         c."Qty" as originalQuantity,
-        h."Qty" as suppliedQuantity, -- need to amend this with the HistoricalPO data by PO Number and ItemCode
+        '0' as suppliedQuantity, -- need to amend this with the HistoricalPO data by PO Number and ItemCode
         c." Shipping Mode" as freeText1,
         NULL as orderTypeNumber,
-        NULL as line,
+        "Line #" as line,
+        '0' as excludeSetting,
+        c."Supplier Number" as supplierNumber,
         c."Supplier" as supplierName,
         CONVERT(CHAR(8),c."PO RAISED DATE", 112) as orderDate,
         CONVERT(CHAR(8),c."Original ex factory", 112) as requestDate
     FROM 
     ingest_POCurrent as c 
-    LEFT JOIN ingest_POHistory as h 
+/*
+    LEFT JOIN ingest_POHistory as h -- Decided not to be used 
     ON c."Item Code/Barcode" = h."Item Code"
     AND c."MB PO Number" = h."MB PO Number"  -- need to identify the best combination to match this data
     AND c."Location" = h."Location"
    -- AND c." Shipping Mode" = h." Shipping Mode" -- not always the same for specific PO, need to identify
+*/
    LEFT JOIN vw_Warehouse as w
    ON w.location = c.Location
 
-WHERE h."Qty" IS NOT NULL )
---AND c."MB PO Number" = 'PO-HAN130625AU1' )
+WHERE w.warehouse IS NOT NULL
+-- AND c."MB PO Number" = 'PO-HAN130625AU1' 
+-- AND h."Qty" IS NOT NULL 
+)
 INSERT INTO S4Import_PurchaseOrder ( controlID, warehouse, code, poNumber, deliveryDate, openQuantity, poComment,originalQuantity,
-suppliedQuantity, freeText1, orderTypeNumber, line , supplierName, orderDate, requestDate )
+suppliedQuantity, freeText1, orderTypeNumber, line , excludeSetting, supplierNumber, supplierName, orderDate, requestDate )
 SELECT
     '1' as controlID, 
     warehouse, 
@@ -46,6 +54,8 @@ SELECT
     freeText1, 
     orderTypeNumber, 
     line, 
+    excludeSetting,
+    supplierNumber,
     supplierName, 
     orderDate, 
     requestDate
@@ -65,3 +75,4 @@ CREATE TABLE S4Import_PurchaseOrder  (
     activeDate  NVARCHAR(10), defaultContract  INTEGER, buyingPrice  FLOAT, orderDate  NVARCHAR(10), requestDate  NVARCHAR(10), 
     excludeFromPP  INTEGER, supplierArticleCode  NVARCHAR(25)
  )
+ */

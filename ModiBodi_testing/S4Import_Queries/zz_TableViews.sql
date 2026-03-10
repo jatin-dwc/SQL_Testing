@@ -2,13 +2,17 @@
 
 -- Slim4 Import Tables
 
-select * from S4Import_VariantGeneric ;
+select * from S4Import_VariantGeneric
+WHERE core <> 1 ;
 
 select * from  S4Import_ArticleCodeMaster ;
 
 select * from S4Import_Suppliers ;
 
 select * from S4Import_Logistics ;
+
+select * from S4Import_Transactions 
+WHERE transactionName <> 'Line Item' ;
 
 select * from S4Import_PurchaseOrder
 -- ORDER BY poNumber ;
@@ -21,6 +25,8 @@ WHERE warehouse IS NULL ;
 select * from vw_Warehouse ;
 
 select * from vw_location_warehouse ;
+
+select * from ingest_Customers ;
 
 select * from vw_Last_XMonths ;
 
@@ -47,17 +53,27 @@ select *,
     *
     FROM
         ingest_POCurrent
-    WHERE "Supplier's Inv# Number" IS NOT NULL
-    WHERE "MB PO Number" = 'PO-HAN130625AU1' ;
+ --   WHERE "Supplier's Inv# Number" IS NOT NULL
+    WHERE "MB PO Number" = 'PO-HAN130625AU1' ;  -- PO-HAN130625AU1
 
     select  
     *
     FROM
         ingest_POHistory
-    
-WHERE "MB PO Number" = 'PO-HAN130625AU1'
+    WHERE "Completed (DISCREPANCY)" IS NOT NULL
+    AND "MB PO Number" = 'PO-JI150825AU' 
+-- 'PO-HAN130625AU1'
 -- AND "Location" = '3PLUK UK';
 
+    select  
+    "MB PO Number" as poNumber,
+    Quantity,
+    Qty,
+    "Completed (DISCREPANCY)" as QtyMvmt 
+    FROM
+        ingest_POHistory                -- Need to confirm the Quantity columns with MB team
+    WHERE "Completed (DISCREPANCY)" IS NOT NULL
+    AND "MB PO Number" = 'PO-JI150825AU' 
 
 -- Testing Queries below
 
