@@ -117,3 +117,7 @@ WITH unique_location AS (
     -- where warehouse IS NOT NULL ;
     ORDER BY warehouse
     ;
+
+    select *
+    from 
+    SHPFY_AU

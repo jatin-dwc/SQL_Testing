@@ -1,5 +1,12 @@
 
 -- VIEWS
+/*
+Support views and tables needed,
+    Customers
+    Warehouses
+    Dates with rolling periods 
+
+*/
 -- Create Supporting Warehouse Table to derive filters for included warehouses, assign pricing and other region specific attributes
 
 CREATE VIEW vw_Warehouse AS
