@@ -131,6 +131,84 @@ WITH
             AMZ_UK
         WHERE "order-status" = 'Shipped'
 ),
+        INPUT_REBELAU_1 as (
+        select 
+            '1'  as transactionNumber,
+            '1' as transactionType,
+            'Shipped' as transactionName,
+            CONVERT(NVARCHAR(50), CAST( "REBEL SKU"  AS BIGINT)) as code,
+            CONVERT(CHAR(8), CAST(CAST( LEFT( "End of Week", 19) AS DATETIME) AS DATE), 112) AS issueDate,
+            "Sum of SalesUnits" as issueQuantity,
+            -- ROW_NUMBER() OVER (PARTITION BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ORDER BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ) as lineNumber,
+            'RB - AU' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
+            '0' as salesPrice,
+            'x' as deliveryLocation,
+            'ps' as supplier,
+            'suppliertype' as supplierType,
+            'supplierName' as supplierName,
+            '1' as conversionFactor,
+            CONCAT(CAST( "REBEL SKU" AS BIGINT) , CAST(CONVERT(CHAR(8), CAST(CAST( LEFT( "End of Week", 19) AS DATETIME) AS DATE), 112) as NVARCHAR )) as comboline
+        FROM
+            REBELAU
+),
+        INPUT_REBELAU_2 AS (
+        select 
+            transactionNumber,
+            transactionType,
+            transactionName,
+            code,
+            issueDate,
+            issueQuantity,
+            customerNumber,
+            salesPrice,
+            deliveryLocation,
+            supplier,
+            supplierType,
+            supplierName,
+            conversionFactor,
+            ROW_NUMBER() OVER (PARTITION BY comboline ORDER BY comboline ) as lineNumber
+        FROM
+            INPUT_REBELAU_1
+),
+        INPUT_COLES_1 as (
+        select 
+            '1'  as transactionNumber,
+            '1' as transactionType,
+            'Shipped' as transactionName,
+            CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT)) as code,
+            CONVERT(CHAR(8), CAST(CAST( LEFT( "Date", 19) AS DATETIME) AS DATE), 112) AS issueDate,
+            Qty as issueQuantity,
+            -- ROW_NUMBER() OVER (PARTITION BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ORDER BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ) as lineNumber,
+            'CS' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
+            '0' as salesPrice,
+            'x' as deliveryLocation,
+            'ps' as supplier,
+            'suppliertype' as supplierType,
+            'supplierName' as supplierName,
+            '1' as conversionFactor,
+            CONCAT(CAST( Sku AS BIGINT) , CAST(CONVERT(CHAR(8), CAST(CAST( LEFT( "Date", 19) AS DATETIME) AS DATE), 112) as NVARCHAR )) as comboline
+        FROM
+            COLES
+),
+        INPUT_COLES_2 AS (
+        select 
+            transactionNumber,
+            transactionType,
+            transactionName,
+            code,
+            issueDate,
+            issueQuantity,
+            customerNumber,
+            salesPrice,
+            deliveryLocation,
+            supplier,
+            supplierType,
+            supplierName,
+            conversionFactor,
+            ROW_NUMBER() OVER (PARTITION BY comboline ORDER BY comboline ) as lineNumber
+        FROM
+            INPUT_COLES_1
+),
         INPUT_BIGW_AU_1 AS (
         select
             '1' as transactionNumber,
@@ -185,6 +263,14 @@ WITH
         SELECT 
         transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_AMZ_UK
+        UNION ALL
+        SELECT 
+        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,
+        salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_COLES_2
+        UNION ALL
+        SELECT 
+        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,
+        salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_REBELAU_2
         UNION ALL
         SELECT 
         transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,

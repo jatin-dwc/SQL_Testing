@@ -14,6 +14,20 @@ select * from S4Import_Logistics ;
 select * from S4Import_Transactions 
 WHERE transactionName <> 'Line Item' ;
 
+select
+    t.warehouse,
+    t.customerNumber,
+    c.customerName,
+    SUM(t.issueQuantity) as units
+FROM
+    S4Import_Transactions  as t 
+LEFT JOIN vw_Customers as c  
+ON t.customerNumber = c.CustomerNumber
+GROUP BY t.warehouse, t.customerNumber, c.customerName
+ORDER BY t.customerNumber
+;
+
+
 select * from S4Import_PurchaseOrder
 -- ORDER BY poNumber ;
 
@@ -26,11 +40,17 @@ select * from vw_Warehouse ;
 
 select * from vw_location_warehouse ;
 
+select * from vw_Customers ;
+
 select * from ingest_Customers ;
 
 select * from vw_Last_XMonths ;
 
 --  Ingestion tables testing
+
+select * from REBELAU
+
+select * from Coles ;
 
 select *
 FROM
@@ -117,6 +137,8 @@ WITH unique_location AS (
     -- where warehouse IS NOT NULL ;
     ORDER BY warehouse
     ;
+
+
 
     select *
     from 
