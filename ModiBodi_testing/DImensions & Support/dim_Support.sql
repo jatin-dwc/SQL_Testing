@@ -58,8 +58,8 @@ FROM
 WHERE code IS NOT NULL;
 
 
-select * from vw_Location_Warehouse
-
+select * from vw_Location_Warehouse;
+select * from ingest_Warehouse;
 
 /*
 
