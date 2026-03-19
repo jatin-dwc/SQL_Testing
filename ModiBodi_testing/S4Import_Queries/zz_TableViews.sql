@@ -108,6 +108,50 @@ WHERE LEN(Combo) <= 15
     ;
 
 
+select * from S4Import_StockDetails
+
+select 
+    sd.warehouse,
+    sd.stockType,
+    sum(sd.stockOnHand) as units 
+from 
+    S4Import_StockDetails as sd
+LEFT JOIN S4Import_ArticleCodeMaster as am
+    ON am.warehouse = sd.warehouse
+    AND am.code = sd.code
+WHERE 1=1
+--    AND sd.stockType = 'Available Stock'
+--    AND sd.warehouse = 'AU MB'
+    AND am.warehouse IS NOT NULL
+GROUP BY sd.warehouse, sd.stockType
+ORDER BY sd.warehouse, sd.stockType  ASC
+;
+
+select * from soh_uk_ws
+
+
+select 
+    sd.warehouse,
+    sd.code,
+    sd.stockOnHand as units,
+    am.*
+from 
+    S4Import_StockDetails as sd
+LEFT JOIN S4Import_ArticleCodeMaster as am
+    ON am.warehouse = sd.warehouse
+    AND am.code = sd.code
+WHERE sd.stockType = 'Available Stock'
+--    AND sd.warehouse = 'AU MB'
+    AND am.warehouse IS NOT NULL
+-- GROUP BY sd.warehouse, sd.code
+ORDER BY sd.stockOnHand DESC
+
+
+
+select * from StockType
+
+
+
 select * from ingest_POHistory ;
 
 -- Location Quantity Checks to show which Locations exist in the Input for Hisorical POs but are not being mapped

@@ -2,64 +2,22 @@
 -- Create Transaction table, all Columns required
 /*
 CREATE TABLE S4Import_Transactions (
-controlID  INTEGER, 
-transactionNumber  NVARCHAR(50), 
-transactionType  INTEGER, 
-transactionName  NVARCHAR(50), 
-transactionStatus  NVARCHAR(50), 
-warehouse  NVARCHAR(20), 
-code  NVARCHAR(40), 
-issueDate  CHAR(8), 
-confirmedDate  CHAR(8), 
-requestedDate  CHAR(8), 
-issueQuantity  FLOAT, 
-lineNumber  NVARCHAR(50), 
-confirmedQuantity  FLOAT, 
-requestedQuantity  FLOAT, 
-customerNumber  NVARCHAR(25), 
-customerType  NVARCHAR(50), 
-customerName  NVARCHAR(100), 
-salesPrice  FLOAT, 
-deliveryLocation  NVARCHAR(255), 
-supplier  NVARCHAR(25), 
-supplierType  NVARCHAR(50), 
-supplierName  NVARCHAR(100), 
-uyingPrice  FLOAT, 
-supplyingLocation  NVARCHAR(255), 
-conversionFactor  FLOAT, 
-uD1  NVARCHAR(255), 
-uD2  NVARCHAR(255), 
-uD3  NVARCHAR(255), 
-uD4  NVARCHAR(255), 
-issueTime  Time, 
-linkedTransactionNumber  NVARCHAR(50), 
-demandChannel  NVARCHAR(100), 
-demandRegion  NVARCHAR(100)
+controlID  INTEGER, transactionNumber  NVARCHAR(50), transactionType  INTEGER, transactionName  NVARCHAR(50), transactionStatus  NVARCHAR(50), 
+warehouse  NVARCHAR(20), code  NVARCHAR(40), issueDate  CHAR(8), confirmedDate  CHAR(8), requestedDate  CHAR(8), issueQuantity  FLOAT, lineNumber  NVARCHAR(50), 
+confirmedQuantity  FLOAT, requestedQuantity  FLOAT, customerNumber  NVARCHAR(25), customerType  NVARCHAR(50), customerName  NVARCHAR(100), salesPrice  FLOAT, 
+deliveryLocation  NVARCHAR(255), supplier  NVARCHAR(25), supplierType  NVARCHAR(50), supplierName  NVARCHAR(100), uyingPrice  FLOAT, supplyingLocation  NVARCHAR(255), 
+conversionFactor  FLOAT, uD1  NVARCHAR(255), uD2  NVARCHAR(255), uD3  NVARCHAR(255), uD4  NVARCHAR(255), issueTime  Time, linkedTransactionNumber  NVARCHAR(50), 
+demandChannel  NVARCHAR(100), demandRegion  NVARCHAR(100)
 )
 */
-
 
 /*
 -- Baseline for all Transaction tables, remove those that are unavailable
 INSERT INTO S4Import_Transactions (
-controlID , 
-transactionNumber  , 
-transactionType , 
-transactionName ,
-warehouse , 
-code , 
-issueDate , 
-issueQuantity , 
-lineNumber ,
-customerNumber , 
-salesPrice , 
-deliveryLocation , 
-supplier , 
-buyingPrice , 
-supplyingLocation  , 
-conversionFactor )
+controlID , transactionNumber  , transactionType , transactionName ,warehouse , code , 
+issueDate , issueQuantity , lineNumber ,customerNumber , salesPrice , deliveryLocation , 
+supplier , buyingPrice , supplyingLocation  , conversionFactor )
 */
-
 
 -- Clear table before writing new data
 
@@ -68,6 +26,7 @@ TRUNCATE TABLE S4Import_Transactions ;
 -- Transaction tables for all customers below
 
 WITH 
+/* SHOPIFY AU - ON HOLD UNTIL FORMAT IS FINAL AS AT 18 MARCH 2026
         INPUT_SHPFY_AU as ( -- SHOPIFY AUSTRALIA
         select 
             "Line: ID" as transactionNumber,
@@ -89,8 +48,8 @@ WITH
         WHERE 
         "Line: Quantity" IS NOT NULL  -- probably need for all Shopify sites
         AND "Line: Type" = 'Line Item'
---        AND ID ='6077244407908' -- REMOVE
 ),
+*/
         INPUT_AMZ_AU as (
         select 
             CAST(CONCAT("amazon-order-id", CAST(SKU AS BIGINT) ) AS NVARCHAR)  as transactionNumber,
@@ -252,10 +211,12 @@ WITH
             INPUT_BIGW_AU_1
         ),
     COMBINED AS (
+/*
         SELECT 
         transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier,supplierType, supplierName, conversionFactor FROM INPUT_SHPFY_AU
         UNION ALL
+*/
         SELECT 
         transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_AMZ_AU
@@ -320,6 +281,9 @@ WITH
         ON cs.CustomerNumber = cm.customerNumber 
         
 ;
+
+
+
 
 -- Testing Queries below, the above encompasses the live query to use in SQL server to update dataset
 --/*
