@@ -28,7 +28,9 @@ ORDER BY t.customerNumber
 ;
 
 
+
 select * from S4Import_PurchaseOrder
+WHERE orderTypeNumber = 1
 -- ORDER BY poNumber ;
 
 select * from S4Import_Historical_PO

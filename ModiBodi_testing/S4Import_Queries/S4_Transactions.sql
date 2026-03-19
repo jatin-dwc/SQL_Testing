@@ -324,6 +324,30 @@ WITH
 -- Testing Queries below, the above encompasses the live query to use in SQL server to update dataset
 --/*
 
+select * from REBELNZ
+
+
+INPUT_REBELNZ_1 as (
+        select 
+            '1'  as transactionNumber,
+            '1' as transactionType,
+            'Shipped' as transactionName,
+            CONVERT(NVARCHAR(50), CAST( "ean_upc"  AS BIGINT)) as code,
+            -- CONVERT(CHAR(8), CAST(CAST( LEFT( "End of Week", 19) AS DATETIME) AS DATE), 112) AS issueDate,
+            "qty_sold" as issueQuantity,
+            -- ROW_NUMBER() OVER (PARTITION BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ORDER BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ) as lineNumber,
+            'RB - NZ' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
+            '0' as salesPrice,
+            'x' as deliveryLocation,
+            'ps' as supplier,
+            'suppliertype' as supplierType,
+            'supplierName' as supplierName,
+            '1' as conversionFactor,
+            CONCAT(CAST( "ean_upc" AS BIGINT) , CAST(CONVERT(CHAR(8), CAST(CAST( LEFT( "End of Week", 19) AS DATETIME) AS DATE), 112) as NVARCHAR )) as comboline
+        FROM
+            REBELNZ
+
+
 WITH
 BIGW_AU_1 AS (
         select

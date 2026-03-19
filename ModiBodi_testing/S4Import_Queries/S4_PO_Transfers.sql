@@ -16,10 +16,10 @@ SELECT
     CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
     "File Reference" as poNumber,
     CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
-    Qty as openQuantity,
+    ROUND(Qty,0) as openQuantity,
     "Comments" as poComment,
-    Qty as originalQuantity,
-    Qty as suppliedQuantity,
+    ROUND(Qty,0) as originalQuantity,
+    ROUND(Qty,0) as suppliedQuantity,
     NULL as freeText1,
     '2' as orderTypeNumber,
     NULL as supplierName,
@@ -49,10 +49,10 @@ SELECT
     CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
     "File Reference" as poNumber,
     CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
-    Qty as openQuantity,
+    ROUND(Qty,0) as openQuantity,
     "Comments" as poComment,
-    Qty as originalQuantity,
-    Qty as suppliedQuantity,
+    ROUND(Qty,0) as originalQuantity,
+    ROUND(Qty,0) as suppliedQuantity,
     NULL as freeText1,
     '2' as orderTypeNumber,
     NULL as supplierName,
@@ -82,10 +82,10 @@ SELECT
     CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
     "File Reference" as poNumber,
     CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
-    Qty as openQuantity,
+    ROUND(Qty,0) as openQuantity,
     "Comments" as poComment,
-    Qty as originalQuantity,
-    Qty as suppliedQuantity,
+    ROUND(Qty,0) as originalQuantity,
+    ROUND(Qty,0) as suppliedQuantity,
     NULL as freeText1,
     '2' as orderTypeNumber,
     NULL as supplierName,
@@ -113,12 +113,12 @@ COMBINED AS (
     FROM 
         transfers_uk
 ),
-CLEANUP AS (
+CLEANUP_TFR AS (
     SELECT 
 --      warehouse_from AS warehouse, 
         warehouse_to AS warehouse, 
         code, poNumber, deliveryDate, openQuantity,poComment,
-        originalQuantity,freeText1, orderTypeNumber, suppliedQuantity,supplierName, orderDate, requestDate
+        originalQuantity,suppliedQuantity,freeText1, orderTypeNumber, supplierName, orderDate, requestDate
     from COMBINED
     WHERE
         orderDate IS NOT NULL 
@@ -128,6 +128,9 @@ CLEANUP AS (
                                  -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
                                  -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
 )
+
+select TOP 10 * from CLEANUP_TFR ;
+
     INSERT INTO S4Import_PurchaseOrder ( controlID, warehouse, code, poNumber, deliveryDate, openQuantity, poComment,originalQuantity,
     suppliedQuantity, freeText1, orderTypeNumber,/* line , supplierNumber, supplierName,*/ orderDate, requestDate )
     SELECT
@@ -148,4 +151,32 @@ CLEANUP AS (
         orderDate, 
         requestDate
     FROM
+        CLEANUP_TFR ;
+
+
+/*
+ INSERT INTO S4_Transactions (
+    controlID , transactionNumber,  transactionType , transactionName , warehouse , code , issueDate , 
+        issueQuantity , supplier ,  supplierType , supplierName , /* lineNumber , customerNumber ,  salesPrice ,  deliveryLocation , 
+        buyingPrice ,  supplyingLocation  , conversionFactor */ )/*
+        SELECT
+        '1' as controlID, 
+        poNumber as transactionNumber,
+        orderTypeNumber as ,
+        warehouse, 
+        code, 
+        deliveryDate, 
+        openQuantity, 
+        poComment,
+        originalQuantity,
+        suppliedQuantity, 
+        freeText1,
+        line, 
+        supplierNumber,
+        supplierName,
+        orderDate, 
+        requestDate
+    FROM
         CLEANUP
+        */
+
