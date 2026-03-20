@@ -27,7 +27,7 @@ GROUP BY t.warehouse, t.customerNumber, c.customerName
 ORDER BY t.customerNumber
 ;
 
-
+select * from S4Import_ArticleFilter
 
 select * from S4Import_PurchaseOrder
 WHERE orderTypeNumber = 1

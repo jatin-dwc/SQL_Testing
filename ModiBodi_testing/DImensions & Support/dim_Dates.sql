@@ -7,7 +7,7 @@ select * from vw_Last_XDays;
 ALTER VIEW vw_Last_XDays AS     --  vw_Last_XDays ; vw_Last_XMonths
 SELECT *
 FROM dim_Date
-WHERE DayOffset BETWEEN -3 and 0; -- Interchange between - 3 days (BETWEEN -3 and 0); 12 months (DayOffset >= -366); 24 months (DayOffset >= -723)
+WHERE DayOffset >= -366; -- Interchange between - 3 days (BETWEEN -3 and 0); 12 months (DayOffset >= -366); 24 months (DayOffset >= -723)
 
 -- Create View for Last X Days
 
@@ -15,6 +15,11 @@ CREATE VIEW vw_Last_XDays AS  --  vw_Last_XDays ; vw_Last_XMonths
 SELECT *
 FROM dim_Date
 WHERE DayOffset >= -14;
+
+CREATE VIEW vw_ArticleFilter_12Months AS  --  Date filter specficially for ArticleFilter table
+SELECT *
+FROM dim_Date
+WHERE DayOffset >= -366;
 
 
 

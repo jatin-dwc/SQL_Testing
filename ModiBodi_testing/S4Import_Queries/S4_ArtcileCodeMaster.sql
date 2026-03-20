@@ -66,8 +66,9 @@ SELECT
     END AS groupCode5
 FROM 
     Art_WHS AS aw 
-INNER JOIN vw_Warehouse as w 
+INNER JOIN vw_Warehouse as w  -- Purpose: to link up the currency once all Warehouse x Code combinations have been created
 ON aw.warehouse = w.warehouse
+
 )
 
 
@@ -99,7 +100,10 @@ SELECT
     uD2,
     uD3
 FROM
-    Art_WHS_Price ;
+    Art_WHS_Price as aws
+INNER JOIN vw_Last_XDays as xd 
+    ON xd.DateKey = aws.groupCode5
+ ;
 
 
 

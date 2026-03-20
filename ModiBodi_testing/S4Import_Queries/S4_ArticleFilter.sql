@@ -1,4 +1,5 @@
 
+TRUNCATE TABLE S4Import_ArticleFilter;
 -- Transaction Data
 WITH 
     INPUT_AMZ_AU as (
@@ -102,8 +103,8 @@ WITH
     COMBINED AS (
 /*
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
-        salesPrice, deliveryLocation, supplier,supplierType, supplierName, conversionFactor FROM INPUT_SHPFY_AU
+        code, issueDate, issueQuantity, customerNumber
+        FROM INPUT_SHPFY_AU
         UNION ALL
 */
         SELECT 
@@ -128,23 +129,23 @@ WITH
         SELECT 
         code, issueDate, issueQuantity, customerNumber
         FROM INPUT_BIGW_AU_2
-)
+),
 --    SELECT * from COMBINED -- use this line as a test of the combination and order
     S4_Transaction_all AS (
-        SELECT 
-            '1' as controlID,
-            cs.WarehouseCode,  -- WAREHOUSE LINK TO Customer but do this as the last step
-            code,
-            issueDate,
-            issueQuantity,
-            cm.customerNumber
+        SELECT
+            cs.WarehouseCode as warehouse,  -- WAREHOUSE LINK TO Customer but do this as the last step
+            code
         FROM
             COMBINED as cm
         LEFT JOIN vw_Customers as cs  
-        ON cs.CustomerNumber = cm.customerNumber 
-    ),
-
+        ON cs.CustomerNumber = cm.customerNumber
+        INNER JOIN vw_ArticleFilter_12Months as xd
+        ON cm.issueDate = xd.DateKey
+    )
+,
+-- select * from S4_Transaction_all
 -- Article Code Master
+
 Article_1 AS (
     SELECT 
         CONVERT(NVARCHAR(40), CAST("Item Code" AS BIGINT)) AS code,
@@ -182,10 +183,21 @@ Art_WHS_Price AS (
         END AS groupCode5
     FROM 
         Art_WHS AS aw 
-    INNER JOIN vw_Warehouse as w 
+    INNER JOIN vw_Warehouse as w -- Purpose: to link up the currency once all Warehouse x Code combinations have been created
     ON aw.warehouse = w.warehouse
+    
 ),
-
+S4_ArticleCM_all AS (
+    SELECT
+        code,
+        warehouse
+    FROM
+        Art_WHS_Price as aws
+    INNER JOIN vw_ArticleFilter_12Months as xd 
+    ON xd.DateKey = aws.groupCode5
+),
+--SELECT * from output_ArticleCM
+/*
 -- Historical PO
 HistoricalPO AS (
 select 
@@ -198,9 +210,8 @@ select
     LEFT JOIN vw_location_warehouse as w
    ON w.location = c.Location
    ),
-
+*/
 -- Stock Details
-
 AU_EDI AS (
     SELECT
         'AU EDI' as warehouse,
@@ -351,10 +362,73 @@ COMBINATION AS (
         stockOnHand
     FROM
         SOH_UNPIVOT
+    WHERE code IS NOT NULL
+    AND stockOnHand <> 0
+),
+    S4_StockDetails_all AS (
+    SELECT
+        code,
+        warehouse
+    FROM 
+        SOH_FINAL
 ),
 
+S4_Consolidated_1 AS (
+    SELECT
+        code,
+        warehouse
+    FROM S4_Transaction_all
+    UNION ALL
+    SELECT
+        code,
+        warehouse
+    FROM S4_StockDetails_all
+    UNION ALL
+    SELECT
+        code,
+        warehouse
+    FROM S4_ArticleCM_all
+),
+S4_Consolidated_2 AS (
+    SELECT
+        code,
+        warehouse,
+        ROW_NUMBER() OVER (PARTITION BY CONCAT(code,warehouse) ORDER BY CONCAT(code,warehouse)) AS rn
+    from S4_Consolidated_1
+)
+/*
+        SELECT
+            DISTINCT warehouse,
+            COUNT(code) as count
+        FROM 
+            S4_Consolidated_2
+        WHERE rn =1
+        GROUP BY warehouse
+        ORDER BY warehouse;
 
+SELECT * from S4_Consolidated_2
+WHERE rn =1
+ORDER BY code, warehouse ;
+*/
+INSERT INTO S4Import_ArticleFilter ( controlID, code, warehouse )
+    SELECT
+        '1' as controlID,
+        code,
+        warehouse
+    FROM
+        S4_Consolidated_2
+    WHERE rn=1
 
-    )
-        
+/*
+select * from S4_Consolidated_2 as s42 
+JOIN S4Import_ArticleCodeMaster as am
+ON am.code = s42.code
+AND am.warehouse = s42.warehouse
+WHERE rn=1
+AND s42.warehouse = 'EU MB'
+AND am.code IS NULL */
 ;
+/*
+CREATE TABLE S4Import_ArticleFilter (
+    controlID  INTEGER, warehouse  NVARCHAR(20), code  NVARCHAR(40)
+) */ ;
