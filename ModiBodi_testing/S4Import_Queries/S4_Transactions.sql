@@ -26,7 +26,7 @@ TRUNCATE TABLE S4Import_Transactions ;
 -- Transaction tables for all customers below
 
 WITH 
-/* SHOPIFY AU - ON HOLD UNTIL FORMAT IS FINAL AS AT 18 MARCH 2026
+/*                                                                                      SHOPIFY AU - ON HOLD UNTIL FORMAT IS FINAL AS AT 18 MARCH 2026
         INPUT_SHPFY_AU as ( -- SHOPIFY AUSTRALIA
         select 
             "Line: ID" as transactionNumber,
@@ -168,6 +168,52 @@ WITH
         FROM
             INPUT_COLES_1
 ),
+        INPUT_WOOLIES_1 AS (
+        select 
+            '1'  as transactionNumber,
+            '1' as transactionType,
+            'Shipped' as transactionName,
+            CONVERT(CHAR(8), TRY_CONVERT(DATE, F1, 103), 112) AS issueDate,
+            CONVERT(NVARCHAR(50), CAST( F3 AS BIGINT)) as code,
+            ROUND(TRY_CONVERT(FLOAT , F10 ),0) as issueQuantity,
+            'WW' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
+            CASE 
+                WHEN F10 = 0 THEN 0
+                ELSE ROUND( TRY_CONVERT(FLOAT , F9 ) / F10, 3 )
+            END AS salesPrice,
+            'x' as deliveryLocation,
+            'ps' as supplier,
+            'suppliertype' as supplierType,
+            'supplierName' as supplierName,
+            '1' as conversionFactor,
+            CONCAT(CAST( F3 AS BIGINT) , CONVERT(CHAR(8), TRY_CONVERT(DATE, F1, 103), 112) ) as comboline
+        FROM 
+            Woolies
+        WHERE F3 IS NOT NULL
+        ORDER BY (SELECT NULL)
+        OFFSET 16 ROWS
+        FETCH NEXT 1000000 ROWS ONLY
+        
+),
+        INPUT_WOOLIES_2 AS (
+        SELECT 
+            transactionNumber,
+            transactionType,
+            transactionName,
+            code,
+            issueDate,
+            issueQuantity,
+            customerNumber,
+            salesPrice,
+            deliveryLocation,
+            supplier,
+            supplierType,
+            supplierName,
+            conversionFactor,
+            ROW_NUMBER() OVER (PARTITION BY comboline ORDER BY comboline ) as lineNumber
+        FROM 
+            INPUT_WOOLIES_1            
+),
         INPUT_BIGW_AU_1 AS (
         select
             '1' as transactionNumber,
@@ -232,6 +278,10 @@ WITH
         SELECT 
         transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_REBELAU_2
+        UNION ALL
+        SELECT 
+        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
+        salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_WOOLIES_2
         UNION ALL
         SELECT 
         transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,

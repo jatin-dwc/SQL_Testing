@@ -107,6 +107,25 @@ from
 WHERE LEN(Combo) <= 15
     ;
 
+select * from soh_eu_ws ;
+
+select 
+    DISTINCT "Type",
+    SUM("QTY available") as unitsAvailable
+from soh_uk_online
+GROUP BY "Type" ;
+
+select * from soh_eu_online
+where "Type" = 'Quarantined'
+AND "Stock at hand" <> 0
+
+select * from soh_eu_ws
+where "Type" = 'Quarantined'
+AND "Stock at hand" <> 0
+
+select * from soh_uk_ws
+where "Type" = 'Quarantined'
+AND "Stock at hand" <> 0
 
 select * from S4Import_StockDetails
 

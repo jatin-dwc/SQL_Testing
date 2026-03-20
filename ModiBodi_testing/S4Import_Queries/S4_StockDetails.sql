@@ -10,6 +10,7 @@ AU_EDI AS (
     SELECT
         'AU EDI' as warehouse,
         CONVERT(NVARCHAR(40), CAST("ItemCode" AS BIGINT)) AS code,
+        "ItemClass" as stockType_setting,
         -- SOH,
         "Available Stock" as "AVS",
         "Allocated Current orders" as "ALS",
@@ -22,6 +23,7 @@ AU_ONLINE AS (
     SELECT
         'AU MB' as warehouse, 
         CONVERT(NVARCHAR(40), CAST(",10,0)" AS BIGINT)) AS code,
+        "ItemClass" as stockType_setting,
         "Available Stock" as "AVS",
         "Allocated Current orders" as "ALS",
         "Allocated Back orders" as "BOS",
@@ -60,6 +62,7 @@ EU_ONLINE AS (
             WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
             ELSE  SKU
         END AS code,
+        "Type" as stockType_setting,
         "QTY Available" as "AVS",
         "QTY allocated" as "ALS",
         "QTY on backorder" as "BOS",
@@ -74,6 +77,7 @@ EU_WS AS (
             WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
             ELSE  SKU
         END AS code,
+        "Type" as stockType_setting,
         "QTY Available" as "AVS",
         "QTY allocated" as "ALS",
         "QTY on backorder" as "BOS",
@@ -88,6 +92,7 @@ UK_ONLINE AS (
             WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
             ELSE  SKU
         END AS code,
+        "Type" as stockType_setting,
         "QTY Available" as "AVS",
         "QTY allocated" as "ALS",
         "QTY on backorder" as "BOS",
@@ -102,6 +107,7 @@ UK_WS AS (
             WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
             ELSE  SKU
         END AS code,
+        "Type" as stockType_setting,
         "QTY Available" as "AVS",
         "QTY allocated" as "ALS",
         "QTY on backorder" as "BOS",
@@ -112,12 +118,12 @@ UK_WS AS (
 
 COMBINATION AS (
     SELECT
-        warehouse, code, AVS, ALS, BOS, RQS
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
         AU_EDI
     UNION ALL
     SELECT
-        warehouse, code, AVS, ALS, BOS, RQS
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
         AU_ONLINE
     /*
@@ -134,22 +140,22 @@ COMBINATION AS (
     */
     UNION ALL
     SELECT
-        warehouse, code, AVS, ALS, BOS, RQS
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
         EU_ONLINE
     UNION ALL
     SELECT
-        warehouse, code, AVS, ALS, BOS, RQS
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
         EU_WS
     UNION ALL
     SELECT
-        warehouse, code, AVS, ALS, BOS, RQS
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
         UK_ONLINE
     UNION ALL
     SELECT
-        warehouse, code, AVS, ALS, BOS, RQS
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
         UK_WS
 ),
@@ -160,6 +166,7 @@ COMBINATION AS (
     SELECT
         warehouse,
         code,
+        stockType_setting,
         stockTypeCode,
         stockOnHand
     FROM
@@ -174,6 +181,7 @@ COMBINATION AS (
         CONCAT( warehouse, code, su.stockTypeCode ) as stockID,
         st.StockType,
         CASE 
+            WHEN su.stockTypeCode = 'AVS' AND stockType_setting = 'Quarantined' THEN 1
             WHEN su.stockTypeCode = 'AVS' THEN 0
             ELSE 1
             END AS excludeSetting,

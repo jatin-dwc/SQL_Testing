@@ -1,9 +1,8 @@
 select * from dim_Date ;
 
 select * from vw_Last_XDays;
-select * from vw_Last_XMonths;
 
---Update XDays View
+-- Update XDays View
 
 ALTER VIEW vw_Last_XDays AS     --  vw_Last_XDays ; vw_Last_XMonths
 SELECT *
