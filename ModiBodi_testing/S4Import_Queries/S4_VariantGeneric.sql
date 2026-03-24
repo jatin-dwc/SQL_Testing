@@ -19,7 +19,9 @@ WITH Article_base AS (
             ArticleTest7                        --- REPLACE WITH SQL TABLE, this needs to be the final table
     LEFT JOIN ingest_SizeOrder as s  
     ON s.SizeCode = Size
-    WHERE "ACTIVE SKUS" = 'YES'
+    WHERE "ACTIVE SKUS" = 'YES' 
+    AND LEN("Parent&child SKU" ) > 10
+    AND "Parent&child SKU" IS NOT NULL
 )
 INSERT INTO S4Import_VariantGeneric (controlID,  variantCode, genericCode, genericName, variantNumber, variantName, core )
 SELECT 

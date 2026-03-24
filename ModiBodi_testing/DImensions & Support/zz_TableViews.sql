@@ -1,5 +1,4 @@
 
-
 -- Slim4 Import Tables
 
 select * from S4Import_VariantGeneric
@@ -69,6 +68,35 @@ FROM
 select *
 from 
 ArticleTest7 ;
+
+select
+            "Child SKU"                                                         as variantCode,
+            "Parent SKU"                                                        as genericCode,
+            "Description"                                                       as genericName,
+            s.SizeOrder                                                         as variantNumber,
+            LEFT( Size , 15 )                                                   as variantName,
+            CASE   
+            WHEN "Product Class" = 'Core' then 1
+            ELSE 0
+            END AS core,
+            LEN("Parent&child SKU" ) as "length",
+            "Parent&child SKU" as pcSKU,
+            ROW_NUMBER() OVER (PARTITION BY "Child SKU" ORDER BY "Child SKU")   AS rn
+        FROM
+            ArticleTest7                        --- REPLACE WITH SQL TABLE, this needs to be the final table
+    LEFT JOIN ingest_SizeOrder as s  
+    ON s.SizeCode = Size
+    WHERE "ACTIVE SKUS" = 'YES' 
+        AND "Child SKU" IS NOT NULL
+        AND LEN("Parent&child SKU" ) >=8 AND LEN("Parent&child SKU" ) <25
+
+
+
+
+select *
+from 
+ArticleTest7
+WHERE "Parent&child SKU" IS NULL ;
 
 select 
 DISTINCT( [Size])
