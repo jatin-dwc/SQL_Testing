@@ -27,11 +27,15 @@ AND ab.code IS NOT NULL )
 INSERT INTO S4Import_Logistics (controlID, warehouse, code, stockedItem)
 SELECT 
     '1' as controlID,
-    warehouse,
-    code,
+    aw.warehouse,
+    aw.code,
     stockedItem
 FROM 
-    Article_Warehouse;
+    Article_Warehouse as aw
+INNER JOIN S4Import_ArticleFilter as af 
+    ON af.code = aw.code
+    AND af.warehouse = aw.warehouse
+    ;
 
 -- Setup queries below
 
@@ -78,4 +82,5 @@ outboundGuaranteedShelfLife FLOAT,
 netShelfLife FLOAT,
 productionResource NVARCHAR(65),
 productionResourceName NVARCHAR(100),
-returnWarehouse NVARCHAR(25));
+returnWarehouse NVARCHAR(25)); 
+*/

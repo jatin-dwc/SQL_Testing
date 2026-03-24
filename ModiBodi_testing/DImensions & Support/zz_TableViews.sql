@@ -29,8 +29,16 @@ ORDER BY t.customerNumber
 
 select * from S4Import_ArticleFilter
 
-select * from S4Import_PurchaseOrder
-WHERE orderTypeNumber = 1
+select * from S4Import_PurchaseOrder as po
+JOIN dim_Date as dd 
+ON dd.DateKey = po.deliveryDate
+WHERE dd.FullDate >= CURRENT_DATE
+ORDER BY po.deliveryDate
+
+
+INNER JOIN vw_Last_XDays as xd
+ON xd.DateKey = po.deliveryDate
+WHERE orderTypeNumber = 1           -- 1 = PO, 2 = Transfer
 -- ORDER BY poNumber ;
 
 select * from S4Import_Historical_PO

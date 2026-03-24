@@ -1,4 +1,5 @@
-select * from dim_Date ;
+select * from dim_Date
+WHERE FullDate >= CURRENT_DATE ;
 
 select * from vw_Last_XDays;
 
@@ -21,6 +22,10 @@ SELECT *
 FROM dim_Date
 WHERE DayOffset >= -366;
 
+CREATE VIEW vw_Today AS  --  vw_Last_XDays ; vw_Last_XMonths 
+SELECT *
+FROM dim_Date
+WHERE DayOffset >= 0;
 
 
 

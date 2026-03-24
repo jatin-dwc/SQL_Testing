@@ -81,8 +81,8 @@ INSERT INTO S4Import_ArticleCodeMaster ( controlID, warehouse, code, creationDat
                                 criterium3,criterium4,groupCode1,groupCode2,groupCode3,groupCode4,groupCode5,groupCode6,uD1,uD2,uD3)
 SELECT
     '1' as controlID,
-    warehouse,
-    code,
+    aws.warehouse,
+    aws.code,
     creationDate,
     description,
     salesPrice,
@@ -249,3 +249,4 @@ CREATE TABLE S4Import_ArticleCodeMaster (
     criterium6  FLOAT, 
     criterium7  FLOAT, 
     criterium8  FLOAT ) */
+

@@ -29,7 +29,7 @@ WITH
             "Sum of SalesUnits" as issueQuantity,
             'RB - AU' as customerNumber  -- Adjust Customer Number here, use this to map against Warehouse
         FROM
-            REBELAU
+            REBELAU                        --- REPLACE WITH SQL TABLE
 ),
         INPUT_REBELAU_2 AS (
         select 
@@ -47,7 +47,7 @@ WITH
             Qty as issueQuantity,
             'CS' as customerNumber  -- Adjust Customer Number here, use this to map against Warehouse
         FROM
-            COLES
+            COLES                        --- REPLACE WITH SQL TABLE
 ),
         INPUT_COLES_2 AS (
         select 
@@ -65,7 +65,7 @@ WITH
             ROUND(TRY_CONVERT(FLOAT , F10 ),0) as issueQuantity,
             'WW' as customerNumber  -- Adjust Customer Number here, use this to map against Warehouse
         FROM 
-            Woolies
+            Woolies                        --- REPLACE WITH SQL TABLE
         WHERE F3 IS NOT NULL
         ORDER BY (SELECT NULL)
         OFFSET 16 ROWS
@@ -88,7 +88,7 @@ WITH
             Units as issueQuantity,
             'BW' as customerNumber  -- Adjust Customer Number here, use this to map against Warehouse
         FROM 
-            BigW_AU
+            BigW_AU                        --- REPLACE WITH SQL TABLE
         WHERE Units IS NOT NULL
 ),
         INPUT_BIGW_AU_2 AS (
@@ -223,7 +223,7 @@ AU_EDI AS (
         "Allocated Back orders" as "BOS",
         "On Hold Qty" as "RQS"
     FROM 
-        soh_au_edi
+        soh_au_edi                        --- REPLACE WITH SQL TABLE
 ),
 AU_ONLINE AS (
     SELECT
@@ -235,7 +235,7 @@ AU_ONLINE AS (
         "Allocated Back orders" as "BOS",
         "On Hold Qty" as "RQS"
     FROM 
-        soh_au_online
+        soh_au_online                        --- REPLACE WITH SQL TABLE
 ),
 EU_ONLINE AS (
     SELECT
@@ -250,7 +250,7 @@ EU_ONLINE AS (
         "QTY on backorder" as "BOS",
         "QTY reserved" as "RQS"
     FROM
-        soh_eu_online
+        soh_eu_online                        --- REPLACE WITH SQL TABLE
 ),
 EU_WS AS (
     SELECT
@@ -265,7 +265,7 @@ EU_WS AS (
         "QTY on backorder" as "BOS",
         "QTY reserved" as "RQS"
     FROM
-        soh_eu_ws
+        soh_eu_ws                        --- REPLACE WITH SQL TABLE
 ),
 UK_ONLINE AS (
     SELECT
@@ -280,7 +280,7 @@ UK_ONLINE AS (
         "QTY on backorder" as "BOS",
         "QTY reserved" as "RQS"
     FROM
-        soh_uk_online
+        soh_uk_online                        --- REPLACE WITH SQL TABLE
 ),
 UK_WS AS (
     SELECT
@@ -295,7 +295,7 @@ UK_WS AS (
         "QTY on backorder" as "BOS",
         "QTY reserved" as "RQS"
     FROM
-        soh_uk_ws
+        soh_uk_ws                        --- REPLACE WITH SQL TABLE
 ),
 
 COMBINATION AS (

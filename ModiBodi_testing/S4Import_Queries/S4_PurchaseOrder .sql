@@ -155,7 +155,7 @@ CLEANUP_TFR AS (
         orderDate IS NOT NULL 
         AND warehouse_from IS NOT NULL
         AND warehouse_to IS NOT NULL
-        AND deliveryDate IS NULL -- Keep this for feed into PurchaseOrder, deliveryDate IS NULL, keep the warehouse_to
+        AND deliveryDate IS NULL -- Keep this for PurchaseOrders, deliveryDate IS NULL, keep the warehouse_to
                                  -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
                                  -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
 ),
@@ -198,7 +198,11 @@ SELECT
     orderDate, 
     requestDate
 FROM 
-    COMBO_PO_TFR
+    COMBO_PO_TFR as po
+    /*
+    JOIN dim_Date as dd 
+    ON dd.DateKey = po.deliveryDate
+    WHERE dd.FullDate >= CURRENT_DATE */
 
 
 -- Setup queries below
