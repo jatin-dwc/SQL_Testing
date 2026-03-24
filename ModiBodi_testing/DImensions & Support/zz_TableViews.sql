@@ -20,7 +20,19 @@ select * from S4Import_Suppliers ;
 
 select * from S4Import_Logistics ;
 
+select * from vw_Customers
+
 select * from S4Import_Transactions 
+WHERE 1=1
+AND transactionType = 3
+
+--AND code = '9351343058618'
+--AND lineNumber = '36'
+--AND lineNumber < 11
+AND transactionNumber = '250321 EU MB-WS'
+ORDER BY transactionNumber , lineNumber
+--AND lineNumber IS NULL
+
 WHERE transactionName <> 'Line Item' ;
 
 select

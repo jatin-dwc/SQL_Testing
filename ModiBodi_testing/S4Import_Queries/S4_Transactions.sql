@@ -33,7 +33,6 @@ WITH
         select 
             "Line: ID" as transactionNumber,
             '1' as transactionType,
-            "Line: Type" as transactionName,
             CONVERT(NVARCHAR(50), CAST("Line: SKU" AS BIGINT)) AS code,
             CONVERT(CHAR(8), CAST(CAST( LEFT( "Created At", 19) AS DATETIME) AS DATE), 112) AS issueDate,
             "Line: Quantity" as issueQuantity,
@@ -55,8 +54,7 @@ WITH
         INPUT_AMZ_AU as (
         select 
             CAST(CONCAT("amazon-order-id", CAST(SKU AS BIGINT) ) AS NVARCHAR)  as transactionNumber,
-            '1' as transactionType,
-            "order-status" as transactionName,
+            '2' as transactionType,
             CONVERT(NVARCHAR(50), CAST( SKU  AS BIGINT)) as code,
             CONVERT(CHAR(8), CAST(CAST( LEFT( "purchase-date", 19) AS DATETIME) AS DATE), 112) AS issueDate,
             quantity as issueQuantity,
@@ -75,8 +73,7 @@ WITH
         INPUT_AMZ_UK as (
         select 
             CAST(CONCAT("amazon-order-id", CAST(SKU AS BIGINT) ) AS NVARCHAR)  as transactionNumber,
-            '1' as transactionType,
-            "order-status" as transactionName,
+            '2' as transactionType,
             CONVERT(NVARCHAR(50), CAST( SKU  AS BIGINT)) as code,
             CONVERT(CHAR(8), CAST(CAST( LEFT( "purchase-date", 19) AS DATETIME) AS DATE), 112) AS issueDate,
             quantity as issueQuantity,
@@ -94,9 +91,8 @@ WITH
 ),
         INPUT_REBELAU_1 as (
         select 
-            '1'  as transactionNumber,
-            '1' as transactionType,
-            'Shipped' as transactionName,
+            '1' as transactionNumber,
+            '2' as transactionType,
             CONVERT(NVARCHAR(50), CAST( "REBEL SKU"  AS BIGINT)) as code,
             CONVERT(CHAR(8), CAST(CAST( LEFT( "End of Week", 19) AS DATETIME) AS DATE), 112) AS issueDate,
             "Sum of SalesUnits" as issueQuantity,
@@ -116,7 +112,6 @@ WITH
         select 
             transactionNumber,
             transactionType,
-            transactionName,
             code,
             issueDate,
             issueQuantity,
@@ -134,8 +129,7 @@ WITH
         INPUT_COLES_1 as (
         select 
             '1'  as transactionNumber,
-            '1' as transactionType,
-            'Shipped' as transactionName,
+            '2' as transactionType,
             CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT)) as code,
             CONVERT(CHAR(8), CAST(CAST( LEFT( "Date", 19) AS DATETIME) AS DATE), 112) AS issueDate,
             Qty as issueQuantity,
@@ -155,7 +149,6 @@ WITH
         select 
             transactionNumber,
             transactionType,
-            transactionName,
             code,
             issueDate,
             issueQuantity,
@@ -173,8 +166,7 @@ WITH
         INPUT_WOOLIES_1 AS (
         select 
             '1'  as transactionNumber,
-            '1' as transactionType,
-            'Shipped' as transactionName,
+            '2' as transactionType,
             CONVERT(CHAR(8), TRY_CONVERT(DATE, F1, 103), 112) AS issueDate,
             CONVERT(NVARCHAR(50), CAST( F3 AS BIGINT)) as code,
             ROUND(TRY_CONVERT(FLOAT , F10 ),0) as issueQuantity,
@@ -201,7 +193,6 @@ WITH
         SELECT 
             transactionNumber,
             transactionType,
-            transactionName,
             code,
             issueDate,
             issueQuantity,
@@ -220,7 +211,6 @@ WITH
         select
             '1' as transactionNumber,
             '2' as transactionType,
-            'ShippedBigW' as transactionName,
             CONVERT(NVARCHAR(50), CAST( EAN  AS BIGINT)) as code,
             CONVERT(CHAR(8), CAST(CAST( LEFT( "Promo week", 19) AS DATETIME) AS DATE), 112) AS issueDate,
             Units as issueQuantity,
@@ -243,7 +233,6 @@ WITH
         select 
             transactionNumber,
             transactionType,
-            transactionName,
             code,
             issueDate,
             issueQuantity,
@@ -258,7 +247,7 @@ WITH
         FROM
             INPUT_BIGW_AU_1
         ),
-    COMBINED AS (
+    COMBINED_TRX AS (
 /*
         SELECT 
         transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
@@ -266,28 +255,202 @@ WITH
         UNION ALL
 */
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
+        transactionNumber, transactionType, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_AMZ_AU
         UNION ALL
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
+        transactionNumber, transactionType, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_AMZ_UK
         UNION ALL
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,
+        transactionNumber, transactionType, code, issueDate, issueQuantity, linenumber, customerNumber,
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_COLES_2
         UNION ALL
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,
+        transactionNumber, transactionType, code, issueDate, issueQuantity, linenumber, customerNumber,
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_REBELAU_2
         UNION ALL
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
+        transactionNumber, transactionType, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_WOOLIES_2
         UNION ALL
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, linenumber, customerNumber,
+        transactionNumber, transactionType, code, issueDate, issueQuantity, linenumber, customerNumber,
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_BIGW_AU_2
+),
+    transfers_au AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'EDI'     THEN 'AU EDI'
+            WHEN "From" = 'MB'      THEN 'AU MB'
+            WHEN "From" = 'WS'      THEN 'AU WS'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'EDI'     THEN 'AU EDI'
+            WHEN "To" = 'MB'      THEN 'AU MB'
+            WHEN "To" = 'WS'      THEN 'AU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        "File Reference" as poNumber,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
+        ROUND(Qty,0) as openQuantity,
+        "Comments" as poComment,
+        ROUND(Qty,0) as originalQuantity,
+        ROUND(Qty,0) as suppliedQuantity,
+        NULL as freeText1,
+        '2' as orderTypeNumber,
+        NULL as supplierName,
+        CONVERT(CHAR(8),"Date of Request", 112) as orderDate,
+        CONVERT(CHAR(8),"Date of Request", 112) as requestDate
+    FROM 
+        TFR_AU 
+    ),
+    ---- EU Transfers
+    transfers_eu AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'MB'      THEN 'EU MB'
+            WHEN "From" = 'WS'      THEN 'EU WS'
+            WHEN "From" = 'EU-WS'   THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'UK MB'     THEN 'UK MB'
+            WHEN "To" = 'UK-MB'     THEN 'UK MB'
+            WHEN "To" = 'UK WS'     THEN 'UK WS'
+            WHEN "To" = 'UK-WS'     THEN 'UK WS'
+            WHEN "To" = 'MB'        THEN 'EU MB'
+            WHEN "To" = 'WS'        THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        "File Reference" as poNumber,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
+        ROUND(Qty,0) as openQuantity,
+        "Comments" as poComment,
+        ROUND(Qty,0) as originalQuantity,
+        ROUND(Qty,0) as suppliedQuantity,
+        NULL as freeText1,
+        '2' as orderTypeNumber,
+        NULL as supplierName,
+        CONVERT(CHAR(8),"Date of Request", 112) as orderDate,
+        CONVERT(CHAR(8),"Date of Request", 112) as requestDate
+    FROM 
+        TFR_EU
+    ),
+
+    ---- UK Transfers
+    transfers_uk AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'UK WS'       THEN 'UK WS'
+            WHEN "From" = 'WS'          THEN 'UK WS'
+            WHEN "From" = 'MB'          THEN 'UK MB'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'MB'        THEN 'UK MB'
+            WHEN "To" = 'WS'        THEN 'UK WS'
+            WHEN "To" = ' WS'       THEN 'UK WS'
+            WHEN "To" = 'EU MB'     THEN 'EU MB'
+            WHEN "To" = 'EU WS'     THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        "File Reference" as poNumber,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
+        ROUND(Qty,0) as openQuantity,
+        "Comments" as poComment,
+        ROUND(Qty,0) as originalQuantity,
+        ROUND(Qty,0) as suppliedQuantity,
+        NULL as freeText1,
+        '2' as orderTypeNumber,
+        NULL as supplierName,
+        CONVERT(CHAR(8),"Date of Request", 112) as orderDate,
+        CONVERT(CHAR(8),"Date of Request", 112) as requestDate
+    FROM 
+        TFR_UK
+    ),
+    COMBINED AS (
+        SELECT
+            warehouse_from, warehouse_to, code, poNumber, deliveryDate, openQuantity,poComment,
+            originalQuantity,suppliedQuantity,freeText1,orderTypeNumber,supplierName, orderDate, requestDate
+        FROM 
+            transfers_au
+        UNION ALL
+        SELECT
+            warehouse_from, warehouse_to, code, poNumber, deliveryDate, openQuantity,poComment,
+            originalQuantity,suppliedQuantity,freeText1,orderTypeNumber,supplierName, orderDate, requestDate
+        FROM 
+            transfers_eu
+        UNION ALL
+        SELECT
+            warehouse_from, warehouse_to, code, poNumber, deliveryDate, openQuantity,poComment,
+            originalQuantity,suppliedQuantity,freeText1,orderTypeNumber,supplierName, orderDate, requestDate
+        FROM 
+            transfers_uk
+    ),
+    CLEANUP_TFR AS (
+        SELECT 
+            warehouse_from AS warehouse, 
+    --        warehouse_to AS warehouse, 
+            code, 
+            poNumber as transactionNumber, 
+            deliveryDate as issueDate, 
+            openQuantity as issueQuantity,
+            poComment,
+            originalQuantity,
+            suppliedQuantity,
+            freeText1, 
+            orderTypeNumber, 
+            supplierName, 
+            orderDate, 
+            requestDate,
+            '1' as conversionFactor,
+            '3' as transactionType,
+            'Sale between locations' as transactionName,
+            ROW_NUMBER() OVER (PARTITION BY poNumber ORDER BY poNumber, deliveryDate, code ) as lineNumber,
+            NULL as customerNumber,
+            NULL as salesPrice,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType
+        from COMBINED as cb
+        INNER JOIN vw_ArticleFilter_12Months as xd
+                ON cb.deliveryDate = xd.DateKey
+        WHERE
+            orderDate IS NOT NULL 
+            AND warehouse_from IS NOT NULL
+            AND warehouse_to IS NOT NULL
+            AND xd.FullDate <= CURRENT_DATE
+            AND deliveryDate IS NOT NULL -- Keep this for feed into PurchaseOrder, deliveryDate IS NULL, keep the warehouse_to
+                                    -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
+                                    -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
+                                    
+),
+--select * from CLEANUP_TFR
+
+COMBO_TRX_TRF AS (
+        SELECT
+            transactionNumber, transactionType, 
+            'Sale to 3PL' as transactionName,
+            cs.WarehouseCode as warehouse, code, issueDate, issueQuantity, lineNumber, cmt.customerNumber,
+            cs.customerType, cs.customerName , 
+        salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor
+        FROM
+            COMBINED_TRX as cmt
+        LEFT JOIN vw_Customers as cs  
+            ON cs.CustomerNumber = cmt.customerNumber
+        UNION ALL
+        SELECT
+            transactionNumber, transactionType, transactionName, warehouse, code, issueDate, issueQuantity, lineNumber, customerNumber,
+            NULL as customerType, NULL as customerName, 
+        salesPrice, deliveryLocation , supplier, supplierType, supplierName, conversionFactor
+        FROM
+            CLEANUP_TFR
+
 )
 --    SELECT * from COMBINED -- use this line as a test of the combination and order
 
@@ -301,7 +464,9 @@ WITH
         issueDate , 
         issueQuantity , 
         lineNumber ,
-        customerNumber , 
+        customerNumber ,
+        customerType,
+        customerName, 
         salesPrice , 
         deliveryLocation , 
         supplier , 
@@ -315,12 +480,14 @@ WITH
             transactionNumber,
             transactionType,
             transactionName,
-            cs.WarehouseCode,  -- WAREHOUSE LINK TO Customer but do this as the last step
+            cm.warehouse,  -- WAREHOUSE LINK TO Customer but do this as the last step
             cm.code,
             issueDate,
             issueQuantity,
             lineNumber,
-            cm.customerNumber,
+            customerNumber,
+            customerType,
+            customerName, 
             salesPrice,
             deliveryLocation,
             supplier,
@@ -328,14 +495,12 @@ WITH
             supplierName,
             conversionFactor
         FROM
-            COMBINED as cm
-        LEFT JOIN vw_Customers as cs  
-            ON cs.CustomerNumber = cm.customerNumber
+            COMBO_TRX_TRF as cm
         INNER JOIN vw_ArticleFilter_12Months as xd
             ON cm.issueDate = xd.DateKey
         INNER JOIN S4Import_ArticleFilter as af 
             ON af.code = cm.code
-            AND af.warehouse = cs.WarehouseCode
+            AND af.warehouse = cm.warehouse
         WHERE 
             xd.FullDate <= CURRENT_DATE
         
@@ -353,7 +518,7 @@ select * from REBELNZ
 INPUT_REBELNZ_1 as (
         select 
             '1'  as transactionNumber,
-            '1' as transactionType,
+            '2' as transactionType,
             'Shipped' as transactionName,
             CONVERT(NVARCHAR(50), CAST( "ean_upc"  AS BIGINT)) as code,
             -- CONVERT(CHAR(8), CAST(CAST( LEFT( "End of Week", 19) AS DATETIME) AS DATE), 112) AS issueDate,

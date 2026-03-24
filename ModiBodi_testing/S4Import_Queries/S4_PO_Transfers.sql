@@ -131,13 +131,29 @@ CLEANUP_TFR AS (
                                  -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
                                  -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
 )
-/*
+
 select * from CLEANUP_TFR
 ORDER BY deliveryDate DESC
  ;
 */
-    INSERT INTO S4Import_PurchaseOrder ( controlID, warehouse, code, poNumber, deliveryDate, openQuantity, poComment,originalQuantity,
-    suppliedQuantity, freeText1, orderTypeNumber,/* line , supplierNumber, supplierName,*/ orderDate, requestDate )
+    INSERT INTO S4Import_Transactions ( controlID , 
+        --transactionNumber  , 
+        --transactionType , 
+        --transactionName ,
+        warehouse , 
+        code , 
+        issueDate , 
+        issueQuantity , 
+        lineNumber ,
+        customerNumber , 
+        salesPrice , 
+        deliveryLocation , 
+        supplier , 
+        supplierType ,
+        supplierName ,
+        -- buyingPrice , -- Need to find this
+        -- supplyingLocation  , -- Need to find this
+        conversionFactor )
     SELECT
         '1' as controlID, 
         warehouse, 
@@ -160,7 +176,7 @@ ORDER BY deliveryDate DESC
 
 
 /*
- INSERT INTO S4_Transactions (
+ INSERT INTO S4Import_Transactions (
     controlID , transactionNumber,  transactionType , transactionName , warehouse , code , issueDate , 
         issueQuantity , supplier ,  supplierType , supplierName , /* lineNumber , customerNumber ,  salesPrice ,  deliveryLocation , 
         buyingPrice ,  supplyingLocation  , conversionFactor */ )/*

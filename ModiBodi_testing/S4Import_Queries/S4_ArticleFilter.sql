@@ -100,7 +100,7 @@ WITH
         FROM
             INPUT_BIGW_AU_1
         ),
-    COMBINED AS (
+    COMBINED_TRX AS (
 /*
         SELECT 
         code, issueDate, issueQuantity, customerNumber
@@ -130,20 +130,131 @@ WITH
         code, issueDate, issueQuantity, customerNumber
         FROM INPUT_BIGW_AU_2
 ),
+
+    transfers_au AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'EDI'     THEN 'AU EDI'
+            WHEN "From" = 'MB'      THEN 'AU MB'
+            WHEN "From" = 'WS'      THEN 'AU WS'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'EDI'     THEN 'AU EDI'
+            WHEN "To" = 'MB'      THEN 'AU MB'
+            WHEN "To" = 'WS'      THEN 'AU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate
+    FROM 
+        TFR_AU 
+    ),
+    ---- EU Transfers
+    transfers_eu AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'MB'      THEN 'EU MB'
+            WHEN "From" = 'WS'      THEN 'EU WS'
+            WHEN "From" = 'EU-WS'   THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'UK MB'     THEN 'UK MB'
+            WHEN "To" = 'UK-MB'     THEN 'UK MB'
+            WHEN "To" = 'UK WS'     THEN 'UK WS'
+            WHEN "To" = 'UK-WS'     THEN 'UK WS'
+            WHEN "To" = 'MB'        THEN 'EU MB'
+            WHEN "To" = 'WS'        THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate
+    FROM 
+        TFR_EU
+    ),
+
+    ---- UK Transfers
+    transfers_uk AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'UK WS'       THEN 'UK WS'
+            WHEN "From" = 'WS'          THEN 'UK WS'
+            WHEN "From" = 'MB'          THEN 'UK MB'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'MB'        THEN 'UK MB'
+            WHEN "To" = 'WS'        THEN 'UK WS'
+            WHEN "To" = ' WS'       THEN 'UK WS'
+            WHEN "To" = 'EU MB'     THEN 'EU MB'
+            WHEN "To" = 'EU WS'     THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        "File Reference" as poNumber,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate
+    FROM 
+        TFR_UK
+    ),
+    COMBINED AS (
+        SELECT
+            warehouse_from, warehouse_to, code, deliveryDate
+        FROM 
+            transfers_au
+        UNION ALL
+        SELECT
+            warehouse_from, warehouse_to, code, deliveryDate
+        FROM 
+            transfers_eu
+        UNION ALL
+        SELECT
+            warehouse_from, warehouse_to, code, deliveryDate
+        FROM 
+            transfers_uk
+    ),
+    CLEANUP_TFR AS (
+        SELECT 
+            warehouse_from AS warehouse,
+            code,
+            deliveryDate as issueDate
+        from COMBINED as cb
+        INNER JOIN vw_ArticleFilter_12Months as xd
+                ON cb.deliveryDate = xd.DateKey
+        WHERE
+            warehouse_from IS NOT NULL
+            AND warehouse_to IS NOT NULL
+            AND xd.FullDate <= CURRENT_DATE
+            AND deliveryDate IS NOT NULL -- Keep this for feed into PurchaseOrder, deliveryDate IS NULL, keep the warehouse_to
+                                    -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
+                                    -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
+),
+--select * from CLEANUP_TFR
+
+COMBO_TRX_TRF AS (
+        SELECT
+            cs.WarehouseCode as warehouse, code, issueDate
+        FROM
+            COMBINED_TRX as cmt
+        LEFT JOIN vw_Customers as cs  
+            ON cs.CustomerNumber = cmt.customerNumber
+        UNION ALL
+        SELECT
+            warehouse, code, issueDate
+        FROM
+            CLEANUP_TFR
+),
 --    SELECT * from COMBINED -- use this line as a test of the combination and order
     S4_Transaction_all AS (
         SELECT
-            cs.WarehouseCode as warehouse,  -- WAREHOUSE LINK TO Customer but do this as the last step
+            warehouse,  -- WAREHOUSE LINK TO Customer but do this as the last step
             code
         FROM
-            COMBINED as cm
-        LEFT JOIN vw_Customers as cs  
-        ON cs.CustomerNumber = cm.customerNumber
+            COMBO_TRX_TRF as cm
         INNER JOIN vw_ArticleFilter_12Months as xd
         ON cm.issueDate = xd.DateKey
-    )
-,
--- select * from S4_Transaction_all
+    ),
+
 -- Article Code Master
 
 Article_1 AS (
