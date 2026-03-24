@@ -1,15 +1,3 @@
-select * from dim_Date
-WHERE FullDate >= CURRENT_DATE ;
-
-select * from vw_Last_XDays;
-
--- Update XDays View
-
-ALTER VIEW vw_Last_XDays AS     --  vw_Last_XDays ; vw_Last_XMonths
-SELECT *
-FROM dim_Date
-WHERE DayOffset >= -366; -- Interchange between - 3 days (BETWEEN -3 and 0); 12 months (DayOffset >= -366); 24 months (DayOffset >= -723)
-
 -- Create View for Last X Days
 
 CREATE VIEW vw_Last_XDays AS  --  vw_Last_XDays ; vw_Last_XMonths 
@@ -22,14 +10,25 @@ SELECT *
 FROM dim_Date
 WHERE DayOffset >= -366;
 
-CREATE VIEW vw_Today AS  --  vw_Last_XDays ; vw_Last_XMonths 
+
+-- Update XDays View
+
+ALTER VIEW vw_Last_XDays AS     --  vw_Last_XDays ; vw_Last_XMonths
 SELECT *
 FROM dim_Date
-WHERE DayOffset >= 0;
-
+WHERE DayOffset >= -366; -- Interchange between - 3 days (BETWEEN -3 and 0); 12 months (DayOffset >= -366); 24 months (DayOffset >= -723)
 
 
 -- RUN BELOW QUERIES ONCE TO SETUP else use "TRUNCATE TABLE dbo.dim_Date;" to clear and reset
+
+-- Create the table
+CREATE TABLE dbo.dim_Date (
+    DateKey         CHAR(8)     NOT NULL PRIMARY KEY,  -- YYYYMMDD
+    FullDate        DATE        NOT NULL,
+    DayOffset       AS DATEDIFF(DAY, CAST(GETDATE() AS DATE), FullDate),  -- computed, updates daily
+    CalendarYear    INT         NOT NULL,
+    ShortMonthName  CHAR(3)     NOT NULL
+);
 
 -- Populate the table using a recursive CTE
 DECLARE @StartDate DATE = '20200101';  -- change to your desired start date
@@ -50,14 +49,3 @@ SELECT
     UPPER(FORMAT(DateValue, 'MMM'))         AS ShortMonthName
 FROM DateExpansion
 OPTION (MAXRECURSION 0);
-
-
-
--- Create the table
-CREATE TABLE dbo.dim_Date (
-    DateKey         CHAR(8)     NOT NULL PRIMARY KEY,  -- YYYYMMDD
-    FullDate        DATE        NOT NULL,
-    DayOffset       AS DATEDIFF(DAY, CAST(GETDATE() AS DATE), FullDate),  -- computed, updates daily
-    CalendarYear    INT         NOT NULL,
-    ShortMonthName  CHAR(3)     NOT NULL
-);

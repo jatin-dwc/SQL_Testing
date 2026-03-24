@@ -211,6 +211,7 @@ select
    ON w.location = c.Location
    ),
 */
+
 -- Stock Details
 AU_EDI AS (
     SELECT
@@ -308,7 +309,7 @@ COMBINATION AS (
         warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
         AU_ONLINE
-    /*
+    /*              CLEAR THIS IF THE WAREHOUSES ARE NO LONGER NEEDED - BASED ON MAPPING THIS CAN BE DELETED
     UNION ALL
     SELECT
         warehouse, code, AVS, ALS, BOS, RQS
@@ -396,20 +397,7 @@ S4_Consolidated_2 AS (
         ROW_NUMBER() OVER (PARTITION BY CONCAT(code,warehouse) ORDER BY CONCAT(code,warehouse)) AS rn
     from S4_Consolidated_1
 )
-/*
-        SELECT
-            DISTINCT warehouse,
-            COUNT(code) as count
-        FROM 
-            S4_Consolidated_2
-        WHERE rn =1
-        GROUP BY warehouse
-        ORDER BY warehouse;
 
-SELECT * from S4_Consolidated_2
-WHERE rn =1
-ORDER BY code, warehouse ;
-*/
 INSERT INTO S4Import_ArticleFilter ( controlID, code, warehouse )
     SELECT
         '1' as controlID,
@@ -419,16 +407,4 @@ INSERT INTO S4Import_ArticleFilter ( controlID, code, warehouse )
         S4_Consolidated_2
     WHERE rn=1
 
-/*
-select * from S4_Consolidated_2 as s42 
-JOIN S4Import_ArticleCodeMaster as am
-ON am.code = s42.code
-AND am.warehouse = s42.warehouse
-WHERE rn=1
-AND s42.warehouse = 'EU MB'
-AND am.code IS NULL */
 ;
-/*
-CREATE TABLE S4Import_ArticleFilter (
-    controlID  INTEGER, warehouse  NVARCHAR(20), code  NVARCHAR(40)
-) */ ;

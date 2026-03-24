@@ -19,6 +19,8 @@ issueDate , issueQuantity , lineNumber ,customerNumber , salesPrice , deliveryLo
 supplier , buyingPrice , supplyingLocation  , conversionFactor )
 */
 
+-- Row 339 is the END OF THE QUERY
+
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_Transactions ;
@@ -314,7 +316,7 @@ WITH
             transactionType,
             transactionName,
             cs.WarehouseCode,  -- WAREHOUSE LINK TO Customer but do this as the last step
-            code,
+            cm.code,
             issueDate,
             issueQuantity,
             lineNumber,
@@ -328,7 +330,14 @@ WITH
         FROM
             COMBINED as cm
         LEFT JOIN vw_Customers as cs  
-        ON cs.CustomerNumber = cm.customerNumber 
+            ON cs.CustomerNumber = cm.customerNumber
+        INNER JOIN vw_ArticleFilter_12Months as xd
+            ON cm.issueDate = xd.DateKey
+        INNER JOIN S4Import_ArticleFilter as af 
+            ON af.code = cm.code
+            AND af.warehouse = cs.WarehouseCode
+        WHERE 
+            xd.FullDate <= CURRENT_DATE
         
 ;
 

@@ -1,7 +1,17 @@
 
 -- Slim4 Import Tables
 
-select * from S4Import_VariantGeneric
+select 
+    controlID,
+    variantCode,
+    genericCode,
+    genericName,
+    variantNumber,
+    variantName,
+    core,
+    LEN(variantCode) as vclen,
+    LEN(genericCode) as gclen
+from S4Import_VariantGeneric
 WHERE core <> 1 ;
 
 select * from  S4Import_ArticleCodeMaster ;
@@ -27,6 +37,18 @@ ORDER BY t.customerNumber
 ;
 
 select * from S4Import_ArticleFilter
+
+SELECT
+            DISTINCT warehouse,
+            COUNT(code) as count
+        FROM 
+            S4Import_ArticleFilter
+        GROUP BY warehouse
+        ORDER BY warehouse;
+
+select * from S4Import_PurchaseOrder
+WHERE orderTypeNumber = 2
+
 
 select * from S4Import_PurchaseOrder as po
 JOIN dim_Date as dd 
