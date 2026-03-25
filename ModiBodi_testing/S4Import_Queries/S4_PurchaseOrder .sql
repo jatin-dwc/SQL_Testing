@@ -181,8 +181,8 @@ INSERT INTO S4Import_PurchaseOrder ( controlID, warehouse, code, poNumber, deliv
 suppliedQuantity, freeText1, orderTypeNumber, line , excludeSetting, supplierNumber, supplierName, orderDate, requestDate )
 SELECT
     '1' as controlID, 
-    warehouse, 
-    code, 
+    po.warehouse, 
+    po.code, 
     poNumber, 
     deliveryDate, 
     openQuantity, 
@@ -199,10 +199,14 @@ SELECT
     requestDate
 FROM 
     COMBO_PO_TFR as po
-    /*
     JOIN dim_Date as dd 
-    ON dd.DateKey = po.deliveryDate
-    WHERE dd.FullDate >= CURRENT_DATE */
+        ON dd.DateKey = po.deliveryDate
+    INNER JOIN vw_Last_XDays as xd 
+        ON xd.DateKey = po.deliveryDate
+    INNER JOIN S4Import_ArticleFilter as af
+        ON af.code = po.code
+        AND af.warehouse = po.warehouse
+    WHERE dd.FullDate >= CURRENT_DATE
 
 
 -- Setup queries below

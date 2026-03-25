@@ -101,7 +101,7 @@ SELECT
     uD3
 FROM
     Art_WHS_Price as aws
-INNER JOIN vw_Last_XDays as xd 
+INNER JOIN vw_Last_XDays as xd -- Suporting date view for rolling days - initial ingestion is 12-24 months history (TBC) and then will be rolling 14 days
     ON xd.DateKey = aws.groupCode5
  ;
 

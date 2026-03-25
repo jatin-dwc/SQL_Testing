@@ -67,7 +67,7 @@ WITH
             'supplierName' as supplierName,
             '1' as conversionFactor
         FROM
-            AMZ_AU
+            AMZ_AU              -- Edit once in SQL Server
         WHERE "order-status" = 'Shipped'
 ),
         INPUT_AMZ_UK as (

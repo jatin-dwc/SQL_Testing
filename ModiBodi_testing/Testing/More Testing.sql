@@ -1,8 +1,4 @@
-
-
-
-
--- AU Transfers
+   -- AU Transfers
 WITH transfers_au AS (
 SELECT
     CASE  
@@ -65,7 +61,6 @@ SELECT
 FROM 
     TFR_EU
 ),
-
 ---- UK Transfers
 transfers_uk AS (
 SELECT
@@ -98,7 +93,7 @@ SELECT
 FROM 
     TFR_UK
 ),
-COMBINED AS (
+COMBINED_TFR AS (
     SELECT
         warehouse_from, warehouse_to, code, poNumber, deliveryDate, openQuantity,poComment,
         originalQuantity,suppliedQuantity,freeText1,orderTypeNumber,supplierName, orderDate, requestDate
@@ -119,99 +114,18 @@ COMBINED AS (
 ),
 CLEANUP_TFR AS (
     SELECT 
-        warehouse_from AS warehouse, 
---        warehouse_to AS warehouse, 
+--      warehouse_from AS warehouse, 
+        warehouse_to AS warehouse, 
         code, poNumber, deliveryDate, openQuantity,poComment,
         originalQuantity,suppliedQuantity,freeText1, orderTypeNumber, supplierName, orderDate, requestDate
-    from COMBINED as cb
-    INNER JOIN vw_ArticleFilter_12Months as xd
-            ON cb.deliveryDate = xd.DateKey
+    from COMBINED_TFR
     WHERE
         orderDate IS NOT NULL 
         AND warehouse_from IS NOT NULL
         AND warehouse_to IS NOT NULL
-        AND xd.FullDate <= CURRENT_DATE
-        AND deliveryDate IS NOT NULL -- Keep this for feed into PurchaseOrder, deliveryDate IS NULL, keep the warehouse_to
+        AND deliveryDate IS NOT NULL -- Keep this for PurchaseOrders, deliveryDate IS NULL, keep the warehouse_to
                                  -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
                                  -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
 )
-/*
-select * from CLEANUP_TFR
-ORDER BY deliveryDate DESC
- ;
-*/
-    INSERT INTO S4Import_PurchaseOrder ( controlID, warehouse, code, poNumber, deliveryDate, openQuantity, poComment,originalQuantity,
-    suppliedQuantity, freeText1, orderTypeNumber,/* line , supplierNumber, supplierName,*/ orderDate, requestDate )
-    SELECT
-        '1' as controlID, 
-        warehouse, 
-        code, 
-        poNumber, 
-        deliveryDate, 
-        openQuantity, 
-        poComment,
-        originalQuantity,
-        suppliedQuantity, 
-        freeText1, 
-        orderTypeNumber, /*
-        line, 
-        supplierNumber,
-        supplierName, */
-        orderDate, 
-        requestDate
-    FROM
-        CLEANUP_TFR ;
-
-
-/*
- INSERT INTO S4_Transactions (
-    controlID , transactionNumber,  transactionType , transactionName , warehouse , code , issueDate , 
-        issueQuantity , supplier ,  supplierType , supplierName , /* lineNumber , customerNumber ,  salesPrice ,  deliveryLocation , 
-        buyingPrice ,  supplyingLocation  , conversionFactor */ )/*
-        SELECT
-        '1' as controlID, 
-        poNumber as transactionNumber,
-        orderTypeNumber as ,
-        warehouse, 
-        code, 
-        deliveryDate, 
-        openQuantity, 
-        poComment,
-        originalQuantity,
-        suppliedQuantity, 
-        freeText1,
-        line, 
-        supplierNumber,
-        supplierName,
-        orderDate, 
-        requestDate
-    FROM
-        CLEANUP
-        */
-
-
-/*
-FILTER FOR Purchase Order Table
-
-orderDate IS NOT NULL 
-        AND warehouse_from IS NOT NULL
-        AND warehouse_to IS NOT NULL
-        AND deliveryDate IS NULL
-
-*/
-
-/*
-FILTER FOR Transactions Table
-        Filter for last 12 months, and less than the Current Date - today
-        Make sure to change out the Warehouse column too
-
-    INNER JOIN vw_ArticleFilter_12Months as xd
-            ON cb.deliveryDate = xd.DateKey
-    WHERE
-        orderDate IS NOT NULL 
-        AND warehouse_from IS NOT NULL
-        AND warehouse_to IS NOT NULL
-        AND xd.FullDate <= CURRENT_DATE
-        AND deliveryDate IS NOT NULL  -- difference here to exclude empty fields
-
-*/
+SELECT * from CLEANUP_TFR
+WHERE warehouse IS NOT NULL

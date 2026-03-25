@@ -115,8 +115,8 @@ COMBINED AS (
 ),
 CLEANUP_TFR AS (
     SELECT 
-        warehouse_from AS warehouse, 
---        warehouse_to AS warehouse, 
+--        warehouse_from AS warehouse, 
+        warehouse_to AS warehouse, 
         code, poNumber, deliveryDate, openQuantity,poComment,
         originalQuantity,suppliedQuantity,freeText1, orderTypeNumber, supplierName, orderDate, requestDate
     from COMBINED as cb

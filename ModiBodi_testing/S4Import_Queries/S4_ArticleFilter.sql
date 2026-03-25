@@ -1,5 +1,28 @@
 
+-- Clear table before writing new data
+
 TRUNCATE TABLE S4Import_ArticleFilter;
+/*
+Filter criteria
+    - Launch date in the last 12 months or in future OR > Article Code Master
+    - Sales Transaction in the last 12 months OR    Transactions
+    - Stock on Hand > 0 OR  Stock Details
+    - Stock on Order > 0    Purchase Orders
+
+Included so far:
+    - Transactions (including Transfers)
+    - Article Code Master
+    - Stock Details
+    - 
+
+Excluded:
+    - Purchase Orders including Transfers
+    - Historical Purchase Orders including Transfers
+    - Suppliers
+    - Logistics
+
+ */
+
 -- Transaction Data
 WITH 
     INPUT_AMZ_AU as (
@@ -131,7 +154,7 @@ WITH
         FROM INPUT_BIGW_AU_2
 ),
 
-    transfers_au AS (
+    transfers_au_t AS (
     SELECT
         CASE  
             WHEN "From" = 'EDI'     THEN 'AU EDI'
@@ -151,7 +174,7 @@ WITH
         TFR_AU 
     ),
     ---- EU Transfers
-    transfers_eu AS (
+    transfers_eu_t AS (
     SELECT
         CASE  
             WHEN "From" = 'MB'      THEN 'EU MB'
@@ -175,7 +198,7 @@ WITH
     ),
 
     ---- UK Transfers
-    transfers_uk AS (
+    transfers_uk_t AS (
     SELECT
         CASE  
             WHEN "From" = 'UK WS'       THEN 'UK WS'
@@ -201,19 +224,19 @@ WITH
         SELECT
             warehouse_from, warehouse_to, code, deliveryDate
         FROM 
-            transfers_au
+            transfers_au_t
         UNION ALL
         SELECT
             warehouse_from, warehouse_to, code, deliveryDate
         FROM 
-            transfers_eu
+            transfers_eu_t
         UNION ALL
         SELECT
             warehouse_from, warehouse_to, code, deliveryDate
         FROM 
-            transfers_uk
+            transfers_uk_t
     ),
-    CLEANUP_TFR AS (
+    CLEANUP_TFR_t AS (
         SELECT 
             warehouse_from AS warehouse,
             code,
@@ -242,7 +265,7 @@ COMBO_TRX_TRF AS (
         SELECT
             warehouse, code, issueDate
         FROM
-            CLEANUP_TFR
+            CLEANUP_TFR_t
 ),
 --    SELECT * from COMBINED -- use this line as a test of the combination and order
     S4_Transaction_all AS (
@@ -309,20 +332,151 @@ S4_ArticleCM_all AS (
 ),
 --SELECT * from output_ArticleCM
 /*
--- Historical PO
-HistoricalPO AS (
-select 
-        w.warehouse as warehouse,
-        CONVERT(NVARCHAR(40), CAST(c."Item Code"AS BIGINT)) as code,
-        CONVERT(CHAR(8),"Good Received Date" , 112) as deliveredDate,
-        Quantity as deliveredQuantity
-    FROM 
-    ingest_POHistory as c 
-    LEFT JOIN vw_location_warehouse as w
-   ON w.location = c.Location
-   ),
-*/
+-- Current Purchase Orders
 
+
+*/
+-- Historical Purchase Orders
+
+HistoricalPO AS (
+    select 
+            w.warehouse as warehouse,
+            CONVERT(NVARCHAR(40), CAST(c."Item Code"AS BIGINT)) as code,
+            CONVERT(CHAR(8),"Good Received Date" , 112) as deliveredDate,
+            Quantity as deliveredQuantity
+        FROM 
+        ingest_POHistory as c 
+        LEFT JOIN vw_location_warehouse as w
+    ON w.location = c.Location
+    ),
+
+    -- AU Transfers
+    transfers_au_hp AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'EDI'     THEN 'AU EDI'
+            WHEN "From" = 'MB'      THEN 'AU MB'
+            WHEN "From" = 'WS'      THEN 'AU WS'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'EDI'     THEN 'AU EDI'
+            WHEN "To" = 'MB'      THEN 'AU MB'
+            WHEN "To" = 'WS'      THEN 'AU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
+        ROUND(Qty,0) as openQuantity
+    FROM 
+        TFR_AU 
+    ),
+    ---- EU Transfers
+    transfers_eu_hp AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'MB'      THEN 'EU MB'
+            WHEN "From" = 'WS'      THEN 'EU WS'
+            WHEN "From" = 'EU-WS'   THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'UK MB'     THEN 'UK MB'
+            WHEN "To" = 'UK-MB'     THEN 'UK MB'
+            WHEN "To" = 'UK WS'     THEN 'UK WS'
+            WHEN "To" = 'UK-WS'     THEN 'UK WS'
+            WHEN "To" = 'MB'        THEN 'EU MB'
+            WHEN "To" = 'WS'        THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
+        ROUND(Qty,0) as openQuantity
+    FROM 
+        TFR_EU
+    ),
+    ---- UK Transfers
+    transfers_uk_hp AS (
+    SELECT
+        CASE  
+            WHEN "From" = 'UK WS'       THEN 'UK WS'
+            WHEN "From" = 'WS'          THEN 'UK WS'
+            WHEN "From" = 'MB'          THEN 'UK MB'
+            ELSE NULL 
+        END AS warehouse_from,
+        CASE  
+            WHEN "To" = 'MB'        THEN 'UK MB'
+            WHEN "To" = 'WS'        THEN 'UK WS'
+            WHEN "To" = ' WS'       THEN 'UK WS'
+            WHEN "To" = 'EU MB'     THEN 'EU MB'
+            WHEN "To" = 'EU WS'     THEN 'EU WS'
+            ELSE NULL 
+        END AS warehouse_to,
+        CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
+        CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
+        ROUND(Qty,0) as openQuantity
+    FROM 
+        TFR_UK
+),
+COMBINED_TFR AS (
+    SELECT
+        warehouse_from, warehouse_to, code, deliveryDate, openQuantity
+    FROM 
+        transfers_au_hp
+    UNION ALL
+    SELECT
+        warehouse_from, warehouse_to, code, deliveryDate, openQuantity
+    FROM 
+        transfers_eu_hp
+    UNION ALL
+    SELECT
+        warehouse_from, warehouse_to, code, deliveryDate, openQuantity
+    FROM 
+        transfers_uk_hp
+),
+CLEANUP_TFR_hp AS (
+    SELECT  
+        warehouse_to AS warehouse, 
+        code, 
+        deliveryDate, 
+        openQuantity
+    from COMBINED_TFR
+    WHERE
+        warehouse_from IS NOT NULL
+        AND warehouse_to IS NOT NULL
+        AND deliveryDate IS NOT NULL -- Keep this for PurchaseOrders, deliveryDate IS NULL, keep the warehouse_to
+                                 -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
+                                 -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
+),
+COMBINED_HPO_TFR AS (
+    SELECT
+        warehouse, 
+        code, 
+        deliveryDate as deliveredDate, 
+        openQuantity as deliveredQuantity
+    FROM 
+        CLEANUP_TFR_hp
+    UNION ALL
+    SELECT
+        warehouse, 
+        code, 
+        deliveredDate, 
+        deliveredQuantity
+    FROM 
+        HistoricalPO
+),
+S4_HistoricalPO_all AS (
+    select
+        warehouse, 
+        code
+    from COMBINED_HPO_TFR as po
+    JOIN dim_Date as dd 
+        ON dd.DateKey = po.deliveredDate
+    INNER JOIN vw_Last_XDays as xd 
+        ON xd.DateKey = po.deliveredDate
+    WHERE dd.FullDate < CURRENT_DATE
+        AND warehouse IS NOT NULL
+),
 -- Stock Details
 AU_EDI AS (
     SELECT
@@ -500,6 +654,11 @@ S4_Consolidated_1 AS (
         code,
         warehouse
     FROM S4_ArticleCM_all
+    UNION ALL
+    SELECT
+        code,
+        warehouse
+    FROM S4_HistoricalPO_all
 ),
 S4_Consolidated_2 AS (
     SELECT

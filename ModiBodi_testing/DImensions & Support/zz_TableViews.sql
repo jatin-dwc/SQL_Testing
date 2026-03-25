@@ -58,9 +58,18 @@ SELECT
         GROUP BY warehouse
         ORDER BY warehouse;
 
-select * from S4Import_PurchaseOrder
+select * from S4Import_PurchaseOrder -- 6275 rows - 3575 after Article Filter
+
 WHERE orderTypeNumber = 2
 
+select * from S4Import_Historical_PO as hpo
+INNER JOIN vw_Last_XDays as xd
+    ON hpo.deliveredDate = xd.DateKey
+WHERE orderTypeNumber <> 1
+    AND xd.DayOffset = -366
+ ;
+
+SELECT * from vw_Last_XDays 
 
 select * from S4Import_PurchaseOrder as po
 JOIN dim_Date as dd 
