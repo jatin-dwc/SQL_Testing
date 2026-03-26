@@ -3,9 +3,17 @@
 
 TRUNCATE TABLE S4Import_VariantGeneric;
 
-WITH Article_base AS (
+WITH 
+    whs AS (
         select
-            "Child SKU"                                                         as variantCode,
+            warehouse,
+            region
+        from 
+            vw_Warehouse
+    ),
+    Article_base AS (
+        select
+            CONVERT(NVARCHAR(40), CAST("Item Code" AS BIGINT))                                                        as code,            
             "Parent SKU"                                                        as genericCode,
             "Description"                                                       as genericName,
             s.SizeOrder                                                         as variantNumber,
@@ -13,8 +21,7 @@ WITH Article_base AS (
             CASE   
             WHEN "Product Class" = 'Core' then 1
             ELSE 0
-            END AS core,
-            ROW_NUMBER() OVER (PARTITION BY "Child SKU" ORDER BY "Child SKU")   AS rn
+            END AS core
         FROM
             ArticleTest7                        --- REPLACE WITH SQL TABLE, this needs to be the final table
     LEFT JOIN ingest_SizeOrder as s  
@@ -22,20 +29,38 @@ WITH Article_base AS (
     WHERE "ACTIVE SKUS" = 'YES' 
     AND LEN("Parent&child SKU" ) > 10
     AND "Parent&child SKU" IS NOT NULL
-)
+),
+    variantPrep AS (
+        SELECT
+            CONCAT ( w.warehouse, '_' , ab.code ) as variantCode,
+            genericCode,
+            genericName,
+            variantNumber,
+            variantName,
+            core,
+            ROW_NUMBER() OVER (PARTITION BY CONCAT ( w.warehouse, '_' , ab.code ) ORDER BY CONCAT ( w.warehouse, '_' , ab.code )) AS rn
+        FROM 
+            Article_base as ab
+        CROSS JOIN
+            whs as w
+        INNER JOIN S4Import_ArticleFilter as af 
+            ON af.warehouse = w.warehouse
+            AND af.code = ab.code
+    )
 INSERT INTO S4Import_VariantGeneric (controlID,  variantCode, genericCode, genericName, variantNumber, variantName, core )
-SELECT 
-    '1' as controlID,
-    variantCode,
-    genericCode,
-    genericName,
-    variantNumber,
-    variantName,
-    core
-    from
-    Article_base
-        WHERE rn = 1
-        AND variantCode IS NOT NULL ;
+        SELECT 
+            '1' as controlID,
+            variantCode,
+            genericCode,
+            genericName,
+            variantNumber,
+            variantName,
+            core
+            from
+            variantPrep
+                WHERE 1=1
+                AND rn = 1
+                AND variantCode IS NOT NULL ;
 
 -- Setup queries 
 /*

@@ -129,3 +129,62 @@ CLEANUP_TFR AS (
 )
 SELECT * from CLEANUP_TFR
 WHERE warehouse IS NOT NULL
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+select * from Suppliers ;
+
+
+
+select * from Master_Supplier
+
+
+-- MOQ is meant to be per Style not by SKU - what is the general grouping to be used?
+
+select * from ArticleTest7 ;
+
+    select 
+        ar."Item Code"     as code,
+        "Parent SKU"    as parentcode,
+        "Primary Supplier" as pSupplier,
+        MOQ,  -- per Style Colour
+        "Lead Time" as leadtime
+
+    from ArticleTest7 as ar
+        JOIN Suppliers as s
+        ON ar."Item Code" = s."Item Code" ;
+
+
+WITH parent as (
+    select 
+        DISTINCT
+        ar."Parent SKU"    as parentcode,
+        s.MOQ,
+        s."Lead Time (days)" as leadtime 
+    from ArticleTest7 as ar
+        JOIN Suppliers as s
+        ON ar."Item Code" = s."Item Code"
+    WHERE ar."Parent SKU" IS NOT NULL
+        AND s.MOQ IS NOT NULL
+        AND ar."Parent SKU" <> '' ),
+    count as (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY parentcode ORDER BY parentcode) AS rn
+    FROM parent )
+    select * from count 
+--WHERE rn <> 1
+ ;
+
+ select * from vw_Warehouse

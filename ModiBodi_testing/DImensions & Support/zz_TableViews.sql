@@ -106,11 +106,67 @@ select * from Coles ;
 
 select *
 FROM
-    AMZ_Orders
+    AMZ_Orders ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 select *
 from 
 ArticleTest7 ;
+
+
+select TOP 50
+    --"Item Code" as code,
+    CONCAT( 'WHS','_', "Item Code") as variantCode, 
+    --"Child SKU" as variantCode_old,
+    "Style Absorbency colour" as variantName,
+    "Parent SKU" as genericCode, -- include WHS prefix
+    "Description" as genericName
+FROM   
+ArticleTest7
+
+select * from S4Import_ArticleFilter
+
+select * from S4Import_VariantGeneric
+
+
+select * from S4Import_Suppliers as s
+INNER JOIN S4Import_ArticleFilter as af
+ON af.code = s.code
+AND af.warehouse = s.warehouse
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 select
             "Child SKU"                                                         as variantCode,
