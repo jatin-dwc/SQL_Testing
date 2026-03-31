@@ -1,4 +1,6 @@
-
+CREATE PROCEDURE load_S4PurchaseOrders
+    AS
+        BEGIN
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_PurchaseOrder ;
@@ -208,7 +210,8 @@ FROM
         AND af.warehouse = po.warehouse
     WHERE dd.FullDate >= CURRENT_DATE
     AND openQuantity > 0
-
+;
+END ;
 
 -- Setup queries below
 /*

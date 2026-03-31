@@ -1,4 +1,7 @@
-
+CREATE PROCEDURE load_S4ArticleFilter
+    AS
+        BEGIN
+    
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_ArticleFilter;
@@ -822,3 +825,5 @@ INSERT INTO S4Import_ArticleFilter ( controlID, code, warehouse )
     WHERE rn=1
 
 ;
+
+END;

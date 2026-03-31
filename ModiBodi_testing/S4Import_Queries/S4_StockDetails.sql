@@ -1,4 +1,6 @@
-
+CREATE PROCEDURE load_S4LStockDetails
+    AS
+        BEGIN
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_StockDetails ;
@@ -202,16 +204,17 @@ COMBINATION AS (
     AND stockOnHand <> 0
 
 ;
-
+END ;
 
 
 
 ---- Testing queries below
 
 
-
+/*
 CREATE TABLE S4Import_StockDetails (
     controlID  INTEGER, warehouse  NVARCHAR(20), code  NVARCHAR(40), stockOnHand  INTEGER, stockID  NVARCHAR(50), stockType  NVARCHAR(100), excludeSetting  INTEGER, 
     excludeTillDate  CHAR(8), excludeFromDate  CHAR(8), initialShelfLife  FLOAT, remainingShelfLife  FLOAT, uD1  NVARCHAR(255), 
     uD2  NVARCHAR(255), uD3  NVARCHAR(255), uD4  NVARCHAR(255), ExcludeFromAM  NVARCHAR(25)
 )
+ */

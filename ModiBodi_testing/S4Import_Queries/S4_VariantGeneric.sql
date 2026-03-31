@@ -1,4 +1,6 @@
-
+CREATE PROCEDURE load_S4VariantGeneric
+    AS
+        BEGIN
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_VariantGeneric;
@@ -61,6 +63,7 @@ INSERT INTO S4Import_VariantGeneric (controlID,  variantCode, genericCode, gener
                 WHERE 1=1
                 AND rn = 1
                 AND variantCode IS NOT NULL ;
+END ;
 
 -- Setup queries 
 /*

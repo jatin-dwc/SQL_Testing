@@ -1,3 +1,6 @@
+CREATE PROCEDURE load_S4HistoricalPO
+    AS
+        BEGIN
 
 -- Clear table before writing new data
 
@@ -209,6 +212,8 @@ supplierName, buyingPrice )
     WHERE dd.FullDate < CURRENT_DATE
         AND warehouse IS NOT NULL
         ;
+END;
+
 
 -- Setup queries below
 /*

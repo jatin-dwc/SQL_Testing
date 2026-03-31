@@ -117,10 +117,10 @@ FROM
 
 
 
+select * from vw_Last_XDays ;
 
 
-
-
+EXEC load_S4Tables ;
 
 
 select *

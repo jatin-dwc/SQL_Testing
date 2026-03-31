@@ -20,7 +20,9 @@ supplier , buyingPrice , supplyingLocation  , conversionFactor )
 */
 
 -- Row 339 is the END OF THE QUERY
-
+CREATE PROCEDURE load_S4Transactions
+    AS
+        BEGIN
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_Transactions ;
@@ -501,9 +503,9 @@ COMBO_TRX_TRF AS (
             AND af.warehouse = cm.warehouse
         WHERE 
             xd.FullDate <= CURRENT_DATE
-        
-;
 
+;
+END ;
 
 
 

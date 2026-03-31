@@ -1,4 +1,6 @@
-
+ CREATE PROCEDURE load_S4Suppliers
+    AS
+        BEGIN
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_Suppliers ;
@@ -122,7 +124,8 @@ WITH
         INNER JOIN S4Import_ArticleFilter as af
             ON af.code = s.code
             AND af.warehouse = s.warehouse
-
+;
+END ;
 
 -- Setup queries below
 /*

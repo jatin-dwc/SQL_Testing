@@ -1,4 +1,7 @@
 
+CREATE PROCEDURE load_S4ArticleCodeMaster
+    AS
+        BEGIN
 -- Clear table before writing new data
 
 TRUNCATE TABLE S4Import_ArticleCodeMaster ;
@@ -105,6 +108,7 @@ INNER JOIN vw_Last_XDays as xd -- Suporting date view for rolling days - initial
     ON xd.DateKey = aws.groupCode5
  ;
 
+END ;
 
 
 -- Setup queries below
