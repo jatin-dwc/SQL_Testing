@@ -250,3 +250,4 @@ CREATE TABLE S4Import_ArticleCodeMaster (
     criterium7  FLOAT, 
     criterium8  FLOAT ) */
 
+

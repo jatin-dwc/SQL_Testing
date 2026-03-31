@@ -207,6 +207,7 @@ FROM
         ON af.code = po.code
         AND af.warehouse = po.warehouse
     WHERE dd.FullDate >= CURRENT_DATE
+    AND openQuantity > 0
 
 
 -- Setup queries below

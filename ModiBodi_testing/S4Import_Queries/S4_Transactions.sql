@@ -28,11 +28,11 @@ TRUNCATE TABLE S4Import_Transactions ;
 -- Transaction tables for all customers below
 
 WITH 
-/*                                                                                      SHOPIFY AU - ON HOLD UNTIL FORMAT IS FINAL AS AT 18 MARCH 2026
+--                                                                                      SHOPIFY AU - ON HOLD UNTIL FORMAT IS FINAL AS AT 18 MARCH 2026
         INPUT_SHPFY_AU as ( -- SHOPIFY AUSTRALIA
         select 
             "Line: ID" as transactionNumber,
-            '1' as transactionType,
+            '2' as transactionType,
             CONVERT(NVARCHAR(50), CAST("Line: SKU" AS BIGINT)) AS code,
             CONVERT(CHAR(8), CAST(CAST( LEFT( "Created At", 19) AS DATETIME) AS DATE), 112) AS issueDate,
             "Line: Quantity" as issueQuantity,
@@ -50,7 +50,7 @@ WITH
         "Line: Quantity" IS NOT NULL  -- probably need for all Shopify sites
         AND "Line: Type" = 'Line Item'
 ),
-*/
+
         INPUT_AMZ_AU as (
         select 
             CAST(CONCAT("amazon-order-id", CAST(SKU AS BIGINT) ) AS NVARCHAR)  as transactionNumber,
@@ -246,14 +246,12 @@ WITH
             ROW_NUMBER() OVER (PARTITION BY comboline ORDER BY comboline ) as lineNumber
         FROM
             INPUT_BIGW_AU_1
-        ),
+),
     COMBINED_TRX AS (
-/*
         SELECT 
-        transactionNumber, transactionType, transactionName, code, issueDate, issueQuantity, lineNumber, customerNumber, 
+        transactionNumber, transactionType, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier,supplierType, supplierName, conversionFactor FROM INPUT_SHPFY_AU
         UNION ALL
-*/
         SELECT 
         transactionNumber, transactionType, code, issueDate, issueQuantity, lineNumber, customerNumber, 
         salesPrice, deliveryLocation, supplier, supplierType, supplierName, conversionFactor FROM INPUT_AMZ_AU
