@@ -13,3 +13,6 @@ CREATE PROCEDURE load_S4Tables
 
 
 END ;
+
+
+EXEC Load_S4Tables ;

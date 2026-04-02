@@ -1,190 +1,229 @@
-   -- AU Transfers
-WITH transfers_au AS (
-SELECT
-    CASE  
-        WHEN "From" = 'EDI'     THEN 'AU EDI'
-        WHEN "From" = 'MB'      THEN 'AU MB'
-        WHEN "From" = 'WS'      THEN 'AU WS'
-        ELSE NULL 
-    END AS warehouse_from,
-    CASE  
-        WHEN "To" = 'EDI'     THEN 'AU EDI'
-        WHEN "To" = 'MB'      THEN 'AU MB'
-        WHEN "To" = 'WS'      THEN 'AU WS'
-        ELSE NULL 
-    END AS warehouse_to,
-    CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
-    "File Reference" as poNumber,
-    CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
-    ROUND(Qty,0) as openQuantity,
-    "Comments" as poComment,
-    ROUND(Qty,0) as originalQuantity,
-    ROUND(Qty,0) as suppliedQuantity,
-    NULL as freeText1,
-    '2' as orderTypeNumber,
-    NULL as supplierName,
-    CONVERT(CHAR(8),"Date of Request", 112) as orderDate,
-    CONVERT(CHAR(8),"Date of Request", 112) as requestDate
-FROM 
-    TFR_AU 
-),
----- EU Transfers
-transfers_eu AS (
-SELECT
-    CASE  
-        WHEN "From" = 'MB'      THEN 'EU MB'
-        WHEN "From" = 'WS'      THEN 'EU WS'
-        WHEN "From" = 'EU-WS'   THEN 'EU WS'
-        ELSE NULL 
-    END AS warehouse_from,
-    CASE  
-        WHEN "To" = 'UK MB'     THEN 'UK MB'
-        WHEN "To" = 'UK-MB'     THEN 'UK MB'
-        WHEN "To" = 'UK WS'     THEN 'UK WS'
-        WHEN "To" = 'UK-WS'     THEN 'UK WS'
-        WHEN "To" = 'MB'        THEN 'EU MB'
-        WHEN "To" = 'WS'        THEN 'EU WS'
-        ELSE NULL 
-    END AS warehouse_to,
-    CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
-    "File Reference" as poNumber,
-    CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
-    ROUND(Qty,0) as openQuantity,
-    "Comments" as poComment,
-    ROUND(Qty,0) as originalQuantity,
-    ROUND(Qty,0) as suppliedQuantity,
-    NULL as freeText1,
-    '2' as orderTypeNumber,
-    NULL as supplierName,
-    CONVERT(CHAR(8),"Date of Request", 112) as orderDate,
-    CONVERT(CHAR(8),"Date of Request", 112) as requestDate
-FROM 
-    TFR_EU
-),
----- UK Transfers
-transfers_uk AS (
-SELECT
-    CASE  
-        WHEN "From" = 'UK WS'       THEN 'UK WS'
-        WHEN "From" = 'WS'          THEN 'UK WS'
-        WHEN "From" = 'MB'          THEN 'UK MB'
-        ELSE NULL 
-    END AS warehouse_from,
-    CASE  
-        WHEN "To" = 'MB'        THEN 'UK MB'
-        WHEN "To" = 'WS'        THEN 'UK WS'
-        WHEN "To" = ' WS'       THEN 'UK WS'
-        WHEN "To" = 'EU MB'     THEN 'EU MB'
-        WHEN "To" = 'EU WS'     THEN 'EU WS'
-        ELSE NULL 
-    END AS warehouse_to,
-    CONVERT(NVARCHAR(40), CAST( SKU AS BIGINT)) as code,
-    "File Reference" as poNumber,
-    CONVERT(CHAR(8),"Date Completed", 112) as deliveryDate,
-    ROUND(Qty,0) as openQuantity,
-    "Comments" as poComment,
-    ROUND(Qty,0) as originalQuantity,
-    ROUND(Qty,0) as suppliedQuantity,
-    NULL as freeText1,
-    '2' as orderTypeNumber,
-    NULL as supplierName,
-    CONVERT(CHAR(8),"Date of Request", 112) as orderDate,
-    CONVERT(CHAR(8),"Date of Request", 112) as requestDate
-FROM 
-    TFR_UK
-),
-COMBINED_TFR AS (
+
+-- Clear table before writing new data
+
+
+-- Current Stock Details table creation
+
+WITH 
+AU_EDI AS (
     SELECT
-        warehouse_from, warehouse_to, code, poNumber, deliveryDate, openQuantity,poComment,
-        originalQuantity,suppliedQuantity,freeText1,orderTypeNumber,supplierName, orderDate, requestDate
+        'AU EDI' as warehouse,
+        CONVERT(NVARCHAR(40), CAST("ItemCode" AS BIGINT)) AS code,
+        "ItemClass" as stockType_setting,
+        -- SOH,
+        "Available Stock" as "AVS",
+        "Allocated Current orders" as "ALS",
+        "Allocated Back orders" as "BOS",
+        "On Hold Qty" as "RQS"
     FROM 
-        transfers_au
+        soh_au_edi
+),
+AU_ONLINE AS (
+    SELECT
+        'AU MB' as warehouse, 
+        CONVERT(NVARCHAR(40), CAST(",10,0)" AS BIGINT)) AS code,
+        "ItemClass" as stockType_setting,
+        "Available Stock" as "AVS",
+        "Allocated Current orders" as "ALS",
+        "Allocated Back orders" as "BOS",
+        "On Hold Qty" as "RQS"
+    FROM 
+        soh_au_online
+),
+/*AU_OTHER AS (
+    SELECT
+        'AU WS' as warehouse,
+        CONVERT(NVARCHAR(40), CAST("ItemCode" AS BIGINT)) AS code,
+        -- SOH,
+        "Available Stock" as "AVS",
+        "Allocated Current orders" as "ALS",
+        "Allocated Back orders" as "BOS",
+        "On Hold Qty" as "RQS"
+    FROM 
+        soh_au_other 
+),
+AU_PR AS (
+    SELECT
+        'AU PR' as warehouse,
+        CONVERT(NVARCHAR(40), CAST("ItemCode" AS BIGINT)) AS code,
+        -- SOH,
+        "Available Stock" as "AVS",
+        "Allocated Current orders" as "ALS",
+        "Allocated Back orders" as "BOS",
+        "On Hold Qty" as "RQS"
+    FROM 
+        soh_au_pr
+), */
+EU_ONLINE AS (
+    SELECT
+        'EU MB' as warehouse,
+        CASE 
+            WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
+            ELSE  SKU
+        END AS code,
+        "Type" as stockType_setting,
+        "QTY Available" as "AVS",
+        "QTY allocated" as "ALS",
+        "QTY on backorder" as "BOS",
+        "QTY reserved" as "RQS"
+    FROM
+        soh_eu_online
+),
+EU_WS AS (
+    SELECT
+        'EU MB' as warehouse,
+        CASE 
+            WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
+            ELSE  SKU
+        END AS code,
+        "Type" as stockType_setting,
+        "QTY Available" as "AVS",
+        "QTY allocated" as "ALS",
+        "QTY on backorder" as "BOS",
+        "QTY reserved" as "RQS"
+    FROM
+        soh_eu_ws
+),
+UK_ONLINE AS (
+    SELECT
+        'UK MB' as warehouse,
+        CASE 
+            WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
+            ELSE  SKU
+        END AS code,
+        "Type" as stockType_setting,
+        "QTY Available" as "AVS",
+        "QTY allocated" as "ALS",
+        "QTY on backorder" as "BOS",
+        "QTY reserved" as "RQS"
+    FROM
+        soh_uk_online
+),
+UK_WS AS (
+    SELECT
+        'UK WS' as warehouse,
+        CASE 
+            WHEN CHARINDEX('-',  SKU) > 0 THEN LEFT( SKU , CHARINDEX('-',  SKU  ) - 1 )
+            ELSE  SKU
+        END AS code,
+        "Type" as stockType_setting,
+        "QTY Available" as "AVS",
+        "QTY allocated" as "ALS",
+        "QTY on backorder" as "BOS",
+        "QTY reserved" as "RQS"
+    FROM
+        soh_uk_ws
+),
+
+COMBINATION AS (
+    SELECT
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
+    FROM 
+        AU_EDI
     UNION ALL
     SELECT
-        warehouse_from, warehouse_to, code, poNumber, deliveryDate, openQuantity,poComment,
-        originalQuantity,suppliedQuantity,freeText1,orderTypeNumber,supplierName, orderDate, requestDate
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
     FROM 
-        transfers_eu
+        AU_ONLINE
+    /*
     UNION ALL
     SELECT
-        warehouse_from, warehouse_to, code, poNumber, deliveryDate, openQuantity,poComment,
-        originalQuantity,suppliedQuantity,freeText1,orderTypeNumber,supplierName, orderDate, requestDate
+        warehouse, code, AVS, ALS, BOS, RQS
     FROM 
-        transfers_uk
+        AU_PR
+    UNION ALL
+    SELECT
+        warehouse, code, AVS, ALS, BOS, RQS
+    FROM 
+        AU_OTHER
+    */
+    UNION ALL
+    SELECT
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
+    FROM 
+        EU_ONLINE
+    UNION ALL
+    SELECT
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
+    FROM 
+        EU_WS
+    UNION ALL
+    SELECT
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
+    FROM 
+        UK_ONLINE
+    UNION ALL
+    SELECT
+        warehouse, code, stockType_setting, AVS, ALS, BOS, RQS
+    FROM 
+        UK_WS
 ),
-CLEANUP_TFR AS (
-    SELECT 
---      warehouse_from AS warehouse, 
-        warehouse_to AS warehouse, 
-        code, poNumber, deliveryDate, openQuantity,poComment,
-        originalQuantity,suppliedQuantity,freeText1, orderTypeNumber, supplierName, orderDate, requestDate
-    from COMBINED_TFR
-    WHERE
-        orderDate IS NOT NULL 
-        AND warehouse_from IS NOT NULL
-        AND warehouse_to IS NOT NULL
-        AND deliveryDate IS NOT NULL -- Keep this for PurchaseOrders, deliveryDate IS NULL, keep the warehouse_to
-                                 -- Historical_PO - Change deliveryDate filter to IS NOT NULL, keep warehouse_to
-                                 -- Transactions - Change deliveryDate filter to IS NOT NULL, keep warehouse_from
+
+-- combine queries then UNPIVOT
+
+    SOH_UNPIVOT AS (
+    SELECT
+        warehouse,
+        code,
+        stockType_setting,
+        stockTypeCode,
+        stockOnHand
+    FROM
+        COMBINATION 
+    UNPIVOT (stockOnHand FOR stockTypeCode IN ( "AVS", "ALS", "BOS", "RQS" ) ) as unpvt 
 )
-SELECT * from CLEANUP_TFR
-WHERE warehouse IS NOT NULL
+--,
+select 
+    warehouse,
+    stockType_setting,
+    stockTypeCode,
+    sum(stockOnHand)
+     from SOH_UNPIVOT
+     WHERE stockTypeCode = 'AVS'
+    GROUP BY warehouse, stockType_setting, stockTypeCode
+
+    SOH_FINAL AS ( 
+    SELECT
+        '1' as controlID,
+        warehouse,
+        code,
+        CONCAT( warehouse, code, su.stockTypeCode ) as stockID,
+        st.StockType,
+        CASE 
+            WHEN su.stockTypeCode = 'AVS' AND stockType_setting = 'Quarantined' THEN 1 -- composite stock to also exclude
+            WHEN su.stockTypeCode = 'AVS' THEN 0
+            ELSE 1
+            END AS excludeSetting,
+        stockOnHand
+    FROM
+        SOH_UNPIVOT as su
+    LEFT JOIN StockType as st
+    ON st.StockTypeABB = su.stockTypeCode
+)
+    select * from 
+
+    INSERT INTO S4Import_StockDetails (
+        controlID, warehouse, code, stockID, stockType, excludeSetting, stockOnHand )
+    SELECT
+        controlID, warehouse, code, stockID, stockType, excludeSetting, stockOnHand
+    FROM 
+        SOH_FINAL   
+    WHERE 
+        code IS NOT NULL
+    AND stockOnHand <> 0
+
+;
+END ;
 
 
 
+---- Testing queries below
 
 
-
-
-
-
-
-
-
-
-
-
-select * from Suppliers ;
-
-
-
-select * from Master_Supplier
-
-
--- MOQ is meant to be per Style not by SKU - what is the general grouping to be used?
-
-select * from ArticleTest7 ;
-
-    select 
-        ar."Item Code"     as code,
-        "Parent SKU"    as parentcode,
-        "Primary Supplier" as pSupplier,
-        MOQ,  -- per Style Colour
-        "Lead Time" as leadtime
-
-    from ArticleTest7 as ar
-        JOIN Suppliers as s
-        ON ar."Item Code" = s."Item Code" ;
-
-
-WITH parent as (
-    select 
-        DISTINCT
-        ar."Parent SKU"    as parentcode,
-        s.MOQ,
-        s."Lead Time (days)" as leadtime 
-    from ArticleTest7 as ar
-        JOIN Suppliers as s
-        ON ar."Item Code" = s."Item Code"
-    WHERE ar."Parent SKU" IS NOT NULL
-        AND s.MOQ IS NOT NULL
-        AND ar."Parent SKU" <> '' ),
-    count as (
-    SELECT *,
-        ROW_NUMBER() OVER (PARTITION BY parentcode ORDER BY parentcode) AS rn
-    FROM parent )
-    select * from count 
---WHERE rn <> 1
- ;
-
- select * from vw_Warehouse
+/*
+CREATE TABLE S4Import_StockDetails (
+    controlID  INTEGER, warehouse  NVARCHAR(20), code  NVARCHAR(40), stockOnHand  INTEGER, stockID  NVARCHAR(50), stockType  NVARCHAR(100), excludeSetting  INTEGER, 
+    excludeTillDate  CHAR(8), excludeFromDate  CHAR(8), initialShelfLife  FLOAT, remainingShelfLife  FLOAT, uD1  NVARCHAR(255), 
+    uD2  NVARCHAR(255), uD3  NVARCHAR(255), uD4  NVARCHAR(255), ExcludeFromAM  NVARCHAR(25)
+)
+ */

@@ -1,4 +1,4 @@
-CREATE PROCEDURE load_S4ArticleFilter
+ALTER PROCEDURE load_S4ArticleFilter
     AS
         BEGIN
     
@@ -17,9 +17,9 @@ Included so far:
     - Article Code Master
     - Stock Details
     - Historical Purchase Orders including Transfers
+    - Purchase Orders including Transfers
 
 Excluded:
-    - Purchase Orders including Transfers
     - Suppliers
     - Logistics
 
@@ -618,6 +618,7 @@ S4_HistoricalPO_all AS (
         ON xd.DateKey = po.deliveredDate
     WHERE dd.FullDate < CURRENT_DATE
         AND warehouse IS NOT NULL
+        AND po.code IS NOT NULL
 ),
 -- Stock Details
 AU_EDI AS (

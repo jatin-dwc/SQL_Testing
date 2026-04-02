@@ -1,4 +1,4 @@
-CREATE PROCEDURE load_S4HistoricalPO
+ALTER PROCEDURE load_S4HistoricalPO
     AS
         BEGIN
 
@@ -188,8 +188,8 @@ deliveredQuantity, supplierDetails, orderedDate, requestedDate, orderedQuantity,
 supplierName, buyingPrice )
     SELECT
         '1' as controlID, 
-        warehouse, 
-        code, 
+        po.warehouse, 
+        po.code, 
         poNumber, 
         line, 
         orderTypeNumber, 
@@ -209,8 +209,12 @@ supplierName, buyingPrice )
         ON dd.DateKey = po.deliveredDate
     INNER JOIN vw_Last_XDays as xd 
         ON xd.DateKey = po.deliveredDate
+    INNER JOIN S4Import_ArticleFilter as af
+        ON po.code = af.code
+        AND po.warehouse = af.warehouse 
     WHERE dd.FullDate < CURRENT_DATE
-        AND warehouse IS NOT NULL
+        AND po.warehouse IS NOT NULL
+        AND po.code IS NOT NULL
         ;
 END;
 

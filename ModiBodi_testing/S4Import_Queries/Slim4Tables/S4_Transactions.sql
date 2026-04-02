@@ -20,7 +20,7 @@ supplier , buyingPrice , supplyingLocation  , conversionFactor )
 */
 
 -- Row 339 is the END OF THE QUERY
-CREATE PROCEDURE load_S4Transactions
+ALTER PROCEDURE load_S4Transactions
     AS
         BEGIN
 -- Clear table before writing new data
@@ -41,10 +41,10 @@ WITH
             "Row #" as lineNumber,
             'OL - AU' as customerNumber, -- Adjust Customer Number here, use this to map against Warehouse
             "Line: Price" as salesPrice,
-            'x' as deliveryLocation,
-            'ps' as supplier,
-            'suppliertype' as supplierType,
-            'supplierName' as supplierName,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType,
+            NULL as supplierName,
             '1' as conversionFactor
         FROM
             SHPFY_AU
@@ -63,10 +63,10 @@ WITH
             ROW_NUMBER() OVER (PARTITION BY "amazon-order-id" ORDER BY "amazon-order-id") as lineNumber,
             'MP - Amazon AU' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
             "item-price" as salesPrice,
-            'x' as deliveryLocation,
-            'ps' as supplier,
-            'suppliertype' as supplierType,
-            'supplierName' as supplierName,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType,
+            NULL as supplierName,
             '1' as conversionFactor
         FROM
             AMZ_AU              -- Edit once in SQL Server
@@ -82,10 +82,10 @@ WITH
             ROW_NUMBER() OVER (PARTITION BY "amazon-order-id" ORDER BY "amazon-order-id") as lineNumber,
             'MP - Amazon UK' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
             "item-price" as salesPrice,
-            'x' as deliveryLocation,
-            'ps' as supplier,
-            'suppliertype' as supplierType,
-            'supplierName' as supplierName,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType,
+            NULL as supplierName,
             '1' as conversionFactor
         FROM
             AMZ_UK
@@ -101,10 +101,10 @@ WITH
             -- ROW_NUMBER() OVER (PARTITION BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ORDER BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ) as lineNumber,
             'RB - AU' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
             '0' as salesPrice,
-            'x' as deliveryLocation,
-            'ps' as supplier,
-            'suppliertype' as supplierType,
-            'supplierName' as supplierName,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType,
+            NULL as supplierName,
             '1' as conversionFactor,
             CONCAT(CAST( "REBEL SKU" AS BIGINT) , CAST(CONVERT(CHAR(8), CAST(CAST( LEFT( "End of Week", 19) AS DATETIME) AS DATE), 112) as NVARCHAR )) as comboline
         FROM
@@ -138,10 +138,10 @@ WITH
             -- ROW_NUMBER() OVER (PARTITION BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ORDER BY (CONVERT(NVARCHAR(50), CAST( Sku  AS BIGINT))) ) as lineNumber,
             'CS' as customerNumber,  -- Adjust Customer Number here, use this to map against Warehouse
             '0' as salesPrice,
-            'x' as deliveryLocation,
-            'ps' as supplier,
-            'suppliertype' as supplierType,
-            'supplierName' as supplierName,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType,
+            NULL as supplierName,
             '1' as conversionFactor,
             CONCAT(CAST( Sku AS BIGINT) , CAST(CONVERT(CHAR(8), CAST(CAST( LEFT( "Date", 19) AS DATETIME) AS DATE), 112) as NVARCHAR )) as comboline
         FROM
@@ -177,10 +177,10 @@ WITH
                 WHEN F10 = 0 THEN 0
                 ELSE ROUND( TRY_CONVERT(FLOAT , F9 ) / F10, 3 )
             END AS salesPrice,
-            'x' as deliveryLocation,
-            'ps' as supplier,
-            'suppliertype' as supplierType,
-            'supplierName' as supplierName,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType,
+            NULL as supplierName,
             '1' as conversionFactor,
             CONCAT(CAST( F3 AS BIGINT) , CONVERT(CHAR(8), TRY_CONVERT(DATE, F1, 103), 112) ) as comboline
         FROM 
@@ -221,10 +221,10 @@ WITH
                 WHEN Units = 0 THEN 0
                 ELSE ROUND(Sales / Units, 3 )
             END AS salesPrice,
-            'x' as deliveryLocation,
-            'ps' as supplier,
-            'suppliertype' as supplierType,
-            'supplierName' as supplierName,
+            NULL as deliveryLocation,
+            NULL as supplier,
+            NULL as supplierType,
+            NULL as supplierName,
             '1' as conversionFactor,
             CONCAT(CAST( EAN AS BIGINT) , CAST(CONVERT(CHAR(8), CAST(CAST( LEFT( "Promo week", 19) AS DATETIME) AS DATE), 112) as NVARCHAR )) as comboline
         FROM 
@@ -412,7 +412,7 @@ WITH
             '3' as transactionType,
             'Sale between locations' as transactionName,
             ROW_NUMBER() OVER (PARTITION BY poNumber ORDER BY poNumber, deliveryDate, code ) as lineNumber,
-            NULL as customerNumber,
+            warehouse_to as customerNumber,
             NULL as salesPrice,
             NULL as deliveryLocation,
             NULL as supplier,

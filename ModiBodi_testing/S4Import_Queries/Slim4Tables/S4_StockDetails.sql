@@ -1,4 +1,4 @@
-CREATE PROCEDURE load_S4LStockDetails
+ALTER PROCEDURE load_S4StockDetails
     AS
         BEGIN
 -- Clear table before writing new data
@@ -183,7 +183,8 @@ COMBINATION AS (
         CONCAT( warehouse, code, su.stockTypeCode ) as stockID,
         st.StockType,
         CASE 
-            WHEN su.stockTypeCode = 'AVS' AND stockType_setting = 'Quarantined' THEN 1
+            WHEN su.stockTypeCode = 'AVS' AND stockType_setting = 'Quarantined' THEN 1 
+            WHEN su.stockTypeCode = 'AVS' AND stockType_setting = 'Composite' THEN 1 
             WHEN su.stockTypeCode = 'AVS' THEN 0
             ELSE 1
             END AS excludeSetting,
