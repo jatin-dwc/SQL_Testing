@@ -145,8 +145,8 @@ COMBINED_TFR AS (
 ),
 CLEANUP_TFR AS (
     SELECT 
---      warehouse_from AS warehouse, 
-        warehouse_to AS warehouse, 
+        warehouse_from , 
+        warehouse_to , 
         code, poNumber, deliveryDate, openQuantity,poComment,
         originalQuantity,suppliedQuantity,freeText1, orderTypeNumber, supplierName, orderDate, requestDate
     from COMBINED_TFR
@@ -160,7 +160,8 @@ CLEANUP_TFR AS (
 ),
 COMBINED_HPO_TFR AS (
     SELECT
-        warehouse, code, poNumber,
+        warehouse_from as warehouse, 
+        code, poNumber,
         NULL as line,
         orderTypeNumber,
         deliveryDate as deliveredDate, 
@@ -170,7 +171,7 @@ COMBINED_HPO_TFR AS (
         requestDate as requestedDate,
         NULL as orderedQuantity,
         NULL as requestedQuantity,
-        NULL as supplierNumber,
+        warehouse_to as supplierNumber,
         supplierName,
         NULL as buyingPrice
     FROM 

@@ -1,4 +1,4 @@
-CREATE PROCEDURE load_S4PurchaseOrders
+ALTER PROCEDURE load_S4PurchaseOrders
     AS
         BEGIN
 -- Clear table before writing new data
@@ -148,8 +148,8 @@ COMBINED_TFR AS (
 ),
 CLEANUP_TFR AS (
     SELECT 
---      warehouse_from AS warehouse, 
-        warehouse_to AS warehouse, 
+        warehouse_from , 
+        warehouse_to , 
         code, poNumber, deliveryDate, openQuantity,poComment,
         originalQuantity,suppliedQuantity,freeText1, orderTypeNumber, supplierName, orderDate, requestDate
     from COMBINED_TFR
@@ -163,11 +163,12 @@ CLEANUP_TFR AS (
 ),
 COMBO_PO_TFR AS (
     SELECT 
-        warehouse, code, poNumber, deliveryDate, openQuantity, poComment,originalQuantity,
+        warehouse_from as warehouse,
+        code, poNumber, deliveryDate, openQuantity, poComment,originalQuantity,
         suppliedQuantity, freeText1, orderTypeNumber, 
         NULL as line , 
         '0' as excludeSetting, 
-        NULL as supplierNumber, 
+        warehouse_to as supplierNumber, 
         supplierName, orderDate, requestDate
     FROM
     CLEANUP_TFR
@@ -225,3 +226,4 @@ CREATE TABLE S4Import_PurchaseOrder  (
     excludeFromPP  INTEGER, supplierArticleCode  NVARCHAR(25)
  )
  */
+ 
