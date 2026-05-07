@@ -477,7 +477,7 @@ COMBO_TRX_TRF AS (
         conversionFactor )
         SELECT 
             '1' as controlID,
-            transactionNumber,
+            CONCAT(customerNumber,issueDate, cm.code, cm.warehouse) as transactionNumber,
             transactionType,
             transactionName,
             cm.warehouse,  -- WAREHOUSE LINK TO Customer but do this as the last step
